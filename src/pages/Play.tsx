@@ -233,7 +233,7 @@ export default function Play() {
             <AchievementsCard game={game} ctx={ctx} />
           </aside>
         </div>
-        <p className="pt-4 text-center text-xs text-ink-400">Kidvest is a learning game with replayed historical market data. No real money. Not financial advice.</p>
+        <p className="pt-4 text-center text-xs text-ink-400">Kidvest is a learning game with replayed historical market data. No real money. Not financial advice. <Link to="/about" className="underline">How it works</Link></p>
       </main>
 
       <AssetSheet game={game} market={market} ctx={ctx} assetId={sheet} onClose={() => setSheet(null)} onTrade={trade} />

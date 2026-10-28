@@ -25,7 +25,7 @@ export default function Home() {
     <div className="min-h-full">
       <header className="mx-auto flex max-w-[1180px] items-center justify-between px-8 py-6">
         <Logo />
-        <div className="flex items-center gap-3"><TalkDueBanner compact /><Link to="/parent" className="btn btn-outline btn-md">🔒 Parents</Link></div>
+        <div className="flex items-center gap-3"><TalkDueBanner compact /><Link to="/about" className="btn btn-ghost btn-md">How it works</Link><Link to="/parent" className="btn btn-outline btn-md">🔒 Parents</Link></div>
       </header>
 
       <main className="mx-auto max-w-[1180px] px-8 pb-16">
@@ -45,7 +45,7 @@ export default function Home() {
           </>
         )}
         <p className="mt-16 text-center text-xs text-ink-400">
-          Kidvest is a learning game. Prices replay real market history from 1928 to 2025 in disguise. No real money. Not financial advice. All data stays in this browser.
+          Kidvest is a learning game. Prices replay real market history from 1928 to 2025 in disguise. No real money. Not financial advice. All data stays in this browser. <Link to="/about" className="underline">How it works</Link>
         </p>
       </main>
     </div>
