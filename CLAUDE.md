@@ -45,6 +45,7 @@ src/
     worlds.ts           the three worlds: copy, colours, currency, built-in assets (masks), goal ladders, level titles
     scenarios.ts        the three built-in scenarios (farm 2003-2012, space 1995-2009, city 2005-2024), events, challenges
     rewardSuggestions.ts per-bracket suggestions for real-life rewards
+    historyNotes.ts     one-line parent-facing notes and talk starters for notable real years (1929, 1987, 2008, 2020 ...)
   engine/
     types.ts            all shared types (Game, Profile, Scenario, AssetDef, Snapshot, LogItem, TalkPrompt ...)
     market.ts           buildMarket(scenario, assets, yearSeq): price and payout paths, cpi index, stockMove; typicalSwing
@@ -64,17 +65,26 @@ src/
   components/
     PlayParts.tsx       Hero (balance, countdown or daily dots), Holdings, MarketList, Recap, GoalCard, AllocationCard,
                         ChallengesCard, AchievementsCard, fmtDuration
-    Scene.tsx           world scene frame: backdrops per world and weather, generic pens (space, city), base card, decorations;
+    Scene.tsx           world scene frame: backdrops per world and weather, base card, decorations;
                         assetDeltas() computes per-asset change since a season
-    FarmScene.tsx       farm-specific plots: barn, coop, mud pen, hives, orchard, farmhouse; 4 build-out stages; hover stats
+    Plot.tsx            shared plot used by all three scenes: stage logic (stageOf, CAP, NEXT_AT), hover card, delta chip,
+                        slotFor() two-row layout; each scene supplies buildings, stage names, emoji spots and a PlotTheme
+    FarmScene.tsx       farm buildings: barn, coop, mud pen, hives, orchard, farmhouse; fixed slot layout
+    SpaceScene.tsx      space modules: solar array, greenhouse domes, hangar, dishes, launch pad, crystal rig, fuel depot, StationCore
+    CityScene.tsx       city buildings: towers, HQ, city hall, garage, vault, row houses, bank branch, CityBase
+    Tour.tsx            guided first-run tour (4 spotlight steps, bracket-aware copy); shown once per child via localStorage
+    Confetti.tsx        short deterministic confetti burst (badges, level-ups, goals, rewards)
     GrowthChart.tsx     value chart with ranges (1/3/5y/all), "only saved" and "savings account" lines net of purchases,
                         inflation toggle for bracket 3
     AssetSheet.tsx      asset detail + order ticket per bracket
     RewardsCard.tsx     child-facing rewards card + celebration modal
     YearModals.tsx      year report (forecast) and year review views
     bits.tsx            RiskBadge, Sparkline, AssetIcon, Delta, weatherOf
-    parent/             ChildrenTab, ScenariosTab, AssetsTab, RewardsTab, ReportsTab (+ TalkSection), DataTab, fields
-  pages/                Home (profile picker, first-run welcome), Play (game loop, catch-up, modals, toasts), Parent (PIN gate, tabs)
+    parent/             ChildrenTab, ScenariosTab, AssetsTab, RewardsTab, ReportsTab (+ TalkSection, HistoryTimeline), DataTab, fields
+                        HistoryTimeline: per game year the real year, S&P and CPI, historical note, child behaviour, result
+  pages/                Home (profile picker, first-run welcome), Play (game loop, catch-up, modals, toasts, tour, confetti),
+                        Parent (PIN gate, tabs), About (#/about: methodology, age masks, honesty principles, privacy, sources)
+  lib/ui.tsx            also printElement(el): prints a single element via the print-target stylesheet in index.css
 ```
 
 ## 5. Core mechanics (so you do not have to reverse-engineer them)
@@ -117,11 +127,11 @@ Returns: Damodaran, *Historical Returns on Stocks, Bonds and Bills: 1928-2025* (
 
 ## 9. Known limitations and open items
 
-- Not yet on GitHub: create the repo, push `main`, enable Pages, put the link on Moodle. README has the steps.
+- On GitHub at https://github.com/Lugorrhoe/kidvest, Pages deploys from `main` to https://lugorrhoe.github.io/kidvest/. Put the link on Moodle.
 - Demo preparation (see `../Kidvest_Demo_Script.md`): demo family starts at year boundaries (farm and city in 2008, space in 1999); set Thanja to free play and add the "Ice cream outing" reward before recording.
 - No server, so no real e-mail sending; the talk reminder relies on the .ics and in-app banners.
 - Desktop only; no German UI; no accessibility audit beyond semantic buttons and `aria-hidden` on decorative emoji.
-- Space and City still use the generic pen layout; only the farm has the illustrated buildings with build-out stages. A natural next step is the same treatment for Starbase Nova (docks that grow) and Metro City (buildings that grow).
+- All three worlds have illustrated buildings with four build-out stages (since 28 Oct 2026). Custom assets fall back to a generic module (space) or shop (city). The farm keeps fixed slots; space and city lay plots out dynamically in two rows.
 - The achievements "Storm survivor"/"Patience pays" were easy to earn early; thresholds were tightened once, re-check with the calibration test if gameplay changes.
 - Custom scenarios with `startYear: 'random'` drop story events on new rounds by design.
 - Backups are JSON exports; there is no cloud sync. Deleting a child deletes its rewards and game.
@@ -129,7 +139,6 @@ Returns: Damodaran, *Historical Returns on Stocks, Bonds and Bills: 1928-2025* (
 ## 10. Backlog ideas Lukas has mentioned or approved in principle
 
 - Bank-account add-on: current account, savings account, several accounts, card payments (teaching cash flow before investing).
-- Illustrated scenes for Space and City like the farm.
 - German language, mobile and tablet layout, shareable scenario library (JSON import already exists).
 - A tiny backend only if real e-mail reminders become a must; keep it optional and privacy-preserving.
 
