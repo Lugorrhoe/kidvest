@@ -15,6 +15,7 @@ import { money, pct } from '../engine/format';
 import { advance, advanceMany, buy, buyGoal, catchUp, contextFor, marketFor, sell, type Context, type SeasonReport, type Unlocks } from '../engine/game';
 import type { Market } from '../engine/market';
 import type { Game, Profile } from '../engine/types';
+import { Tour, tourSteps } from '../components/Tour';
 import { cx, Emoji, Logo, Modal } from '../lib/ui';
 
 interface Toast { id: number; emoji: string; title: string; sub: string }
@@ -37,6 +38,7 @@ export default function Play() {
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [celebrate, setCelebrate] = useState<Reward[]>([]);
   const [showReport, setShowReport] = useState(false);
+  const [tour, setTour] = useState(false);
   const [review, setReview] = useState<YearReview | null>(null);
   const gameRef = useRef<Game | null>(null);
   gameRef.current = game;
@@ -101,6 +103,7 @@ export default function Play() {
       setGame(g);
       checkRewards(g);
       if (g.finished) setShowEnd(true);
+      if (g.season === 0 && (g.trades?.length ?? 0) === 0 && !localStorage.getItem(`kidvest-tour-${p.id}`)) setTour(true);
     })();
   }, [profileId, checkRewards]);
 
@@ -217,14 +220,14 @@ export default function Play() {
         <Scene game={game} market={market} ctx={ctx} since={since} onOpen={setSheet} onBuyGoal={purchaseGoal} />
         <div className="grid grid-cols-[minmax(0,1fr)_380px] gap-6">
           <div className="min-w-0 space-y-6">
-            <GrowthChart game={game} market={market} ctx={ctx} />
+            <div data-tour="chart"><GrowthChart game={game} market={market} ctx={ctx} /></div>
             <Holdings game={game} market={market} ctx={ctx} onOpen={setSheet} />
             <MarketList game={game} market={market} ctx={ctx} onOpen={setSheet} />
           </div>
           <aside className="space-y-6">
             <RewardsCard rewards={rewards} game={game} market={market} ctx={ctx} />
             <Recap game={game} ctx={ctx} report={report} />
-            <GoalCard game={game} market={market} ctx={ctx} onBuy={purchaseGoal} />
+            <div data-tour="goal"><GoalCard game={game} market={market} ctx={ctx} onBuy={purchaseGoal} /></div>
             <AllocationCard game={game} market={market} ctx={ctx} />
             <ChallengesCard game={game} market={market} ctx={ctx} />
             <AchievementsCard game={game} ctx={ctx} />
@@ -234,6 +237,10 @@ export default function Play() {
       </main>
 
       <AssetSheet game={game} market={market} ctx={ctx} assetId={sheet} onClose={() => setSheet(null)} onTrade={trade} />
+
+      {tour && !showReport && !away && !review && !showEnd && !sheet && (
+        <Tour steps={tourSteps(game, ctx)} onDone={() => { localStorage.setItem(`kidvest-tour-${profile.id}`, '1'); setTour(false); }} />
+      )}
 
       <div className="fixed bottom-6 right-6 z-50 flex w-80 flex-col gap-3">
         {toasts.map((t) => (

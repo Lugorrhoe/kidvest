@@ -112,7 +112,7 @@ export function Hero({ game, market, ctx, onNext, onYear, busy, pace, now, daily
                   <div className={cx('mt-1 text-xs', dark ? 'text-white/70' : 'text-ink-600')}>{daily.seasonsLeft} of 4 left today. Think before each one!</div>
                 )}
               </div>
-              <button className={cx('btn btn-lg', dark ? 'bg-white text-ink-900 hover:bg-white/90' : 'btn-accent')} disabled={busy || game.finished || daily.locked} onClick={onNext}>
+              <button data-tour="next" className={cx('btn btn-lg', dark ? 'bg-white text-ink-900 hover:bg-white/90' : 'btn-accent')} disabled={busy || game.finished || daily.locked} onClick={onNext}>
                 {daily.locked ? '🔒 Come back tomorrow' : bracket === 1 ? 'Next season ▶' : `Next ${world.seasonWord} ▶`}
               </button>
               <button className={cx('btn btn-md', dark ? 'bg-white/10 text-white hover:bg-white/20' : 'btn-outline')} onClick={onReport}>📋 This year's report</button>
@@ -128,7 +128,7 @@ export function Hero({ game, market, ctx, onNext, onYear, busy, pace, now, daily
             </div>
           ) : (
             <>
-              <button className={cx('btn btn-lg', dark ? 'bg-white text-ink-900 hover:bg-white/90' : 'btn-accent')} disabled={busy || game.finished} onClick={onNext}>
+              <button data-tour="next" className={cx('btn btn-lg', dark ? 'bg-white text-ink-900 hover:bg-white/90' : 'btn-accent')} disabled={busy || game.finished} onClick={onNext}>
                 {game.finished ? 'Round finished' : bracket === 1 ? 'Next season ▶' : `Next ${world.seasonWord} ▶`}
               </button>
               <button className={cx('btn btn-md', dark ? 'bg-white/10 text-white hover:bg-white/20' : 'btn-outline')} disabled={busy || game.finished} onClick={onYear}>
