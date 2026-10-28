@@ -47,6 +47,21 @@ export function Modal({ open, onClose, children, width = 'max-w-3xl' }: { open: 
   );
 }
 
+/** Print only one element: marks it as the print target, prints, and cleans up afterwards. */
+export function printElement(el: HTMLElement | null) {
+  if (!el) return;
+  el.classList.add('print-target');
+  document.body.classList.add('has-print-target');
+  const cleanup = () => {
+    el.classList.remove('print-target');
+    document.body.classList.remove('has-print-target');
+    window.removeEventListener('afterprint', cleanup);
+  };
+  window.addEventListener('afterprint', cleanup);
+  window.print();
+  setTimeout(cleanup, 1000);
+}
+
 export function SectionTitle({ children, right }: { children: ReactNode; right?: ReactNode }) {
   return (
     <div className="mb-3 flex items-center justify-between">

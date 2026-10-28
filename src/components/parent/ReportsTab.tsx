@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Area, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { db } from '../../db/db';
 import { BRACKETS, WORLDS } from '../../data/worlds';
@@ -7,7 +7,7 @@ import { totalValue } from '../../engine/achievements';
 import { money, pct, units } from '../../engine/format';
 import { marketFor } from '../../engine/game';
 import type { Game, Profile } from '../../engine/types';
-import { cx, Emoji } from '../../lib/ui';
+import { cx, Emoji, printElement } from '../../lib/ui';
 import { HistoryTimeline } from './HistoryTimeline';
 import { TalkSection } from './TalkSection';
 
@@ -43,6 +43,7 @@ export function ReportsTab() {
 
 function Report({ p, g }: { p: Profile; g: Game }) {
   const world = WORLDS[p.world];
+  const ref = useRef<HTMLDivElement>(null);
   const m = marketFor(g);
   const fmt = (v: number, o?: { sign?: boolean }) => money(v, world, 3, o);
   const tot = totalValue(g, m);
@@ -68,17 +69,20 @@ function Report({ p, g }: { p: Profile; g: Game }) {
     ['Challenges', `${Object.keys(g.challengesDone).length}/${g.scenario.challenges.length}`],
   ];
   return (
-    <div className="space-y-6">
+    <div ref={ref} className="space-y-6">
       <div className="card card-pad">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-lg font-bold">{g.scenario.name}</div>
+            <div className="text-lg font-bold">{p.name}: {g.scenario.name}</div>
             <div className="text-sm text-ink-600">{world.name} · ages {BRACKETS[p.bracket - 1].ages} · {world.seasonLabel(g.season)}{g.finished ? ' · finished' : ''}</div>
           </div>
-          <div className="rounded-xl bg-amber-50 px-3 py-2 text-right text-sm">
-            <div className="text-xs text-amber-700">Real history replayed (only you see this)</div>
-            <div className="font-bold text-amber-900">{runs.join(', then ')}</div>
-            <div className="text-xs text-amber-700">Now in {m.years[g.season] ?? seq[seq.length - 1]} · chapter {(g.chapters ?? 0) + 1}</div>
+          <div className="flex items-start gap-3">
+            <div className="rounded-xl bg-amber-50 px-3 py-2 text-right text-sm">
+              <div className="text-xs text-amber-700">Real history replayed (only you see this)</div>
+              <div className="font-bold text-amber-900">{runs.join(', then ')}</div>
+              <div className="text-xs text-amber-700">Now in {m.years[g.season] ?? seq[seq.length - 1]} · chapter {(g.chapters ?? 0) + 1}</div>
+            </div>
+            <button className="btn btn-outline btn-md shrink-0" onClick={() => printElement(ref.current)}>🖨️ Print report</button>
           </div>
         </div>
         <div className="mt-5 grid grid-cols-4 gap-3">

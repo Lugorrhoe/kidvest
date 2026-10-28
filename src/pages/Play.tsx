@@ -15,6 +15,7 @@ import { money, pct } from '../engine/format';
 import { advance, advanceMany, buy, buyGoal, catchUp, contextFor, marketFor, sell, type Context, type SeasonReport, type Unlocks } from '../engine/game';
 import type { Market } from '../engine/market';
 import type { Game, Profile } from '../engine/types';
+import { Confetti } from '../components/Confetti';
 import { Tour, tourSteps } from '../components/Tour';
 import { cx, Emoji, Logo, Modal } from '../lib/ui';
 
@@ -39,6 +40,7 @@ export default function Play() {
   const [celebrate, setCelebrate] = useState<Reward[]>([]);
   const [showReport, setShowReport] = useState(false);
   const [tour, setTour] = useState(false);
+  const [burst, setBurst] = useState(0);
   const [review, setReview] = useState<YearReview | null>(null);
   const gameRef = useRef<Game | null>(null);
   gameRef.current = game;
@@ -64,6 +66,7 @@ export default function Play() {
       ...(u.levelUp ? [{ id: Math.random(), emoji: '⭐', title: 'Level up!', sub: u.levelUp }] : []),
     ];
     if (!list.length) return;
+    if (u.achievements.length || u.levelUp) setBurst(Date.now());
     setToasts((t) => [...t, ...list].slice(-4));
     for (const x of list) setTimeout(() => setToasts((t) => t.filter((y) => y.id !== x.id)), 4500);
   }, []);
@@ -182,6 +185,7 @@ export default function Play() {
     if (!r.ok) return alert(r.error);
     commit(r.game);
     toast(r.unlocks);
+    setBurst(Date.now());
   };
   const restart = async (random: boolean) => {
     const g = await startNewRound(profile, { randomHistory: random });
@@ -241,6 +245,9 @@ export default function Play() {
       {tour && !showReport && !away && !review && !showEnd && !sheet && (
         <Tour steps={tourSteps(game, ctx)} onDone={() => { localStorage.setItem(`kidvest-tour-${profile.id}`, '1'); setTour(false); }} />
       )}
+
+      {burst > 0 && <Confetti key={burst} />}
+      {celebrate.length > 0 && <Confetti key={`reward-${celebrate[0].id}`} count={64} />}
 
       <div className="fixed bottom-6 right-6 z-50 flex w-80 flex-col gap-3">
         {toasts.map((t) => (

@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { db } from '../../db/db';
-import { Emoji } from '../../lib/ui';
+import { Emoji, printElement } from '../../lib/ui';
 import { buildTalkIcs, buildTalkSheet, downloadIcs, getTalk, mailtoLink, nextTalkDate, saveTalk, TALK_AGENDA, talkDue, type TalkSettings } from '../../lib/talk';
 import { Field } from './fields';
 
@@ -9,6 +9,7 @@ export function TalkSection() {
   const profiles = useLiveQuery(() => db.profiles.toArray(), []);
   const [t, setT] = useState<TalkSettings | null>(null);
   const [sheet, setSheet] = useState<string | null>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
   useEffect(() => { getTalk().then(setT); }, []);
   if (!t || !profiles) return null;
   const due = talkDue(t, profiles);
@@ -63,10 +64,11 @@ export function TalkSection() {
       </div>
 
       {sheet && (
-        <div className="mt-4 rounded-2xl bg-ink-50 p-4">
+        <div ref={sheetRef} className="mt-4 rounded-2xl bg-ink-50 p-4">
           <div className="flex items-center justify-between">
             <div className="font-bold">Talk sheet</div>
             <div className="flex gap-2">
+              <button className="btn btn-ghost btn-md" onClick={() => printElement(sheetRef.current)}>🖨️ Print</button>
               <a className="btn btn-ghost btn-md" href={mailtoLink('Kidvest talk sheet', sheet, t.email)}>✉️ E-mail it to me</a>
               <button className="btn btn-ghost btn-md" onClick={() => navigator.clipboard?.writeText(sheet)}>Copy</button>
               <button className="btn btn-ghost btn-md" onClick={() => setSheet(null)}>Close</button>
