@@ -1,11 +1,12 @@
-import type { CSSProperties } from 'react';
 import { currentGoal, goalCost } from '../engine/achievements';
-import { money, pct } from '../engine/format';
+import { money } from '../engine/format';
 import type { Context } from '../engine/game';
 import type { Market } from '../engine/market';
 import type { AssetDef, Game } from '../engine/types';
 import { cx, Emoji } from '../lib/ui';
+import { CityBase, CityPlots } from './CityScene';
 import { FarmPlots, Farmhouse } from './FarmScene';
+import { SpacePlots, StationCore } from './SpaceScene';
 
 type Weather = 'storm' | 'rain' | 'cloudy' | 'sunny';
 
@@ -136,91 +137,13 @@ function CityBackdrop({ w }: { w: Weather }) {
 }
 
 /* ------------------------------------------------------------------ pieces */
-const PEN: Record<string, { owned: CSSProperties; empty: CSSProperties; text: string; sign: CSSProperties }> = {
-  farm: {
-    owned: { background: 'linear-gradient(180deg,#c9efae,#a6dc84)', border: '3px solid #b07a43' },
-    empty: { background: 'rgba(255,255,255,.35)', border: '3px dashed #c99a6b' },
-    text: 'text-[#3d2a14]',
-    sign: { background: '#f6deaa', border: '2px solid #b07a43', color: '#5c3d1e' },
-  },
-  space: {
-    owned: { background: 'rgba(130,110,255,.18)', border: '2px solid rgba(180,160,255,.75)', boxShadow: '0 0 26px rgba(140,110,255,.35), inset 0 0 18px rgba(140,110,255,.25)' },
-    empty: { background: 'rgba(255,255,255,.04)', border: '2px dashed rgba(180,160,255,.35)' },
-    text: 'text-white',
-    sign: { background: 'rgba(16,12,52,.85)', border: '1px solid rgba(180,160,255,.6)', color: '#fff' },
-  },
-  city: {
-    owned: { background: 'linear-gradient(180deg,#ffffff,#eef2f5)', border: '2px solid #ced4da', boxShadow: '0 6px 16px rgba(20,23,29,.12)' },
-    empty: { background: 'rgba(255,255,255,.45)', border: '2px dashed #adb5bd' },
-    text: 'text-ink-900',
-    sign: { background: '#14171d', border: '1px solid #14171d', color: '#fff' },
-  },
-};
-
-function DeltaChip({ d, ctx, dark }: { d: AssetDelta; ctx: Context; dark: boolean }) {
-  const { bracket, world } = ctx;
-  const r = bracket === 1 ? Math.round(d.delta) : d.delta;
-  const up = r > 0.004;
-  const down = r < -0.004;
-  const style = up ? { background: '#d3f9d8', color: '#2b8a3e' } : down ? { background: '#ffe3e3', color: '#c92a2a' } : { background: dark ? 'rgba(255,255,255,.15)' : '#e9ecef', color: dark ? '#fff' : '#495057' };
-  const text = bracket === 1
-    ? `${up ? '+' : down ? '−' : '±'}${Math.abs(r)} ${up ? '📈' : down ? '📉' : ''}`
-    : `${money(d.delta, world, bracket, { sign: true })}${bracket === 3 ? ` · ${pct(d.pct, bracket)}` : ''}`;
-  return <span className="chip float-up num whitespace-nowrap shadow-sm" style={style} title={d.payout > 0 ? `including ${money(d.payout, world, bracket)} ${d.asset.payoutWord ?? 'payout'}` : undefined}>{text}</span>;
-}
-
-function Pen({ d, game, market, ctx, onOpen, showDelta }: { d: AssetDelta; game: Game; market: Market; ctx: Context; onOpen: (id: string) => void; showDelta: boolean }) {
-  const { bracket, world } = ctx;
-  const st = PEN[world.id];
-  const owned = d.units > 1e-9;
-  const step = Math.max(1, game.scenario.startCash / 10);
-  const icons = owned ? (bracket === 1 ? Math.round(d.units) : Math.max(1, Math.min(10, Math.round(d.value / step)))) : 1;
-  const shown = Math.min(icons, 10);
-  const price = market.prices[d.asset.id][game.season];
-  return (
-    <button onClick={() => onOpen(d.asset.id)} className={cx('group relative flex min-h-0 flex-col rounded-[18px] p-2.5 text-left transition hover:-translate-y-0.5', st.text)} style={owned ? st.owned : st.empty}>
-      <div className="flex items-start justify-between gap-1">
-        <span className={cx('truncate text-[13px] font-extrabold leading-tight', !owned && 'opacity-70')}>{d.asset.name}</span>
-        {owned && showDelta && <DeltaChip key={`${game.season}-${d.asset.id}`} d={d} ctx={ctx} dark={world.id === 'space'} />}
-      </div>
-      <div className={cx('flex flex-1 flex-wrap content-center items-center justify-center gap-x-1 gap-y-0.5 py-1', !owned && 'opacity-40 grayscale')}>
-        {Array.from({ length: shown }, (_, i) => (
-          <span key={i} className="bob" style={{ animationDelay: `${(i % 5) * 0.35}s` }}>
-            <Emoji e={d.asset.emoji} className={bracket === 1 ? 'text-[30px]' : 'text-[26px]'} />
-          </span>
-        ))}
-        {icons > 10 && <span className="text-xs font-bold">+{icons - 10}</span>}
-      </div>
-      <div className="mt-auto flex items-center justify-between gap-1 rounded-lg px-2 py-1 text-[12px] font-bold" style={owned ? st.sign : { ...st.sign, opacity: 0.75 }}>
-        {owned ? (
-          <>
-            <span className="num">{money(d.value, world, bracket)}</span>
-            <span className="num font-semibold opacity-75">{bracket === 1 ? `×${Math.round(d.units)}` : `${d.units.toLocaleString('en-US', { maximumFractionDigits: 2 })}`}</span>
-          </>
-        ) : (
-          <>
-            <span>🏷️ {money(price, world, bracket, { ceil: bracket === 1 })}</span>
-            <span className="opacity-80">Buy</span>
-          </>
-        )}
-      </div>
-    </button>
-  );
-}
-
 function BaseCard({ game, ctx, since }: { game: Game; ctx: Context; since: number }) {
   const { world, bracket } = ctx;
   const dark = world.id === 'space';
   const income = game.scenario.incomePerSeason * (game.season - since);
   return (
     <div className={cx('relative flex flex-col items-center justify-end rounded-[22px] p-3 text-center', dark ? 'text-white' : 'text-ink-900')} style={world.id === 'farm' ? { background: 'rgba(255,255,255,.25)' } : world.id === 'space' ? { background: 'rgba(255,255,255,.06)', border: '1px solid rgba(180,160,255,.4)' } : { background: 'rgba(255,255,255,.6)' }}>
-      {world.id === 'farm' ? (
-        <Farmhouse />
-      ) : (
-        <div className={cx('flex h-[110px] w-[110px] items-center justify-center rounded-full text-[64px]', dark ? 'bg-white/10 shadow-[0_0_40px_rgba(180,160,255,.5)]' : 'bg-white shadow-card')}>
-          <Emoji e={world.id === 'space' ? '🪐' : '🏢'} />
-        </div>
-      )}
+      {world.id === 'farm' ? <Farmhouse /> : world.id === 'space' ? <StationCore /> : <CityBase />}
       <div className="mt-2 text-[13px] font-extrabold">{world.baseName}</div>
       <div className="num text-lg font-extrabold">{bracket === 1 && <Emoji e="🪙" className="mr-1" />}{money(game.cash, world, bracket)}</div>
       {income > 0 && game.season > 0 && <span key={game.season} className="chip float-up mt-1" style={{ background: '#d3f9d8', color: '#2b8a3e' }}>+{money(income, world, bracket)} pocket money</span>}
@@ -240,12 +163,9 @@ export function Scene({ game, market, ctx, since, onOpen, onBuyGoal }: { game: G
   const showDelta = n > 0;
   const goal = currentGoal(game);
   const cost = goalCost(game, market);
-  const sorted = [...deltas].sort((a, b) => (b.units > 0 ? 1 : 0) - (a.units > 0 ? 1 : 0));
-  const rows = sorted.length > 4 ? 2 : 1;
-  const cols = Math.min(4, Math.max(2, Math.ceil(sorted.length / rows)));
   const total = deltas.reduce((s, d) => s + d.delta, 0);
   return (
-    <div className={cx('scene relative overflow-hidden rounded-3xl shadow-card', world.id === 'farm' ? 'h-[600px]' : 'h-[480px]')}>
+    <div className="scene relative h-[600px] overflow-hidden rounded-3xl shadow-card">
       {world.id === 'farm' ? <FarmBackdrop w={weather} /> : world.id === 'space' ? <SpaceBackdrop w={weather} /> : <CityBackdrop w={weather} />}
       {(weather === 'rain' || weather === 'storm') && world.id !== 'space' && <div className="rain pointer-events-none absolute inset-0 opacity-70" />}
       {weather === 'storm' && world.id === 'space' && [0, 0.6, 1.1, 1.5].map((dl, i) => <span key={i} className="meteor" style={{ top: `${20 + i * 40}px`, right: `${80 + i * 170}px`, animationDelay: `${dl}s` }} />)}
@@ -266,13 +186,11 @@ export function Scene({ game, market, ctx, since, onOpen, onBuyGoal }: { game: G
 
         <div className="mt-4 grid min-h-0 flex-1 grid-cols-[190px_1fr] gap-4">
           <BaseCard game={game} ctx={ctx} since={from} />
-          {world.id === 'farm' ? (
-            <FarmPlots deltas={deltas} game={game} market={market} ctx={ctx} showDelta={showDelta} n={n} onOpen={onOpen} />
-          ) : (
-            <div className="grid min-h-0 gap-3" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0,1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0,1fr))` }}>
-              {sorted.slice(0, cols * rows).map((d) => <Pen key={d.asset.id} d={d} game={game} market={market} ctx={ctx} onOpen={onOpen} showDelta={showDelta} />)}
-            </div>
-          )}
+          {world.id === 'farm'
+            ? <FarmPlots deltas={deltas} game={game} market={market} ctx={ctx} showDelta={showDelta} n={n} onOpen={onOpen} />
+            : world.id === 'space'
+              ? <SpacePlots deltas={deltas} game={game} market={market} ctx={ctx} showDelta={showDelta} n={n} onOpen={onOpen} />
+              : <CityPlots deltas={deltas} game={game} market={market} ctx={ctx} showDelta={showDelta} n={n} onOpen={onOpen} />}
         </div>
 
         <div className="mt-3 flex h-[52px] items-center gap-3">

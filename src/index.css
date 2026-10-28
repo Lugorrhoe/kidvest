@@ -70,5 +70,9 @@ body {
 .anim-sway { display: inline-block; animation: sway 3.8s ease-in-out infinite; transform-origin: 50% 100%; }
 @keyframes mud-shine { 0%, 100% { opacity: .55; } 50% { opacity: .85; } }
 .anim-mud { animation: mud-shine 2.4s ease-in-out infinite; }
+
+/* ---------- space and city animations ---------- */
+@keyframes drift { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 30% { transform: translate(3px, -5px) rotate(4deg); } 65% { transform: translate(-3px, -2px) rotate(-4deg); } }
+.anim-drift { display: inline-block; animation: drift 4.2s ease-in-out infinite; }
 .plot-tip { opacity: 0; transform: translateY(4px); transition: opacity .15s ease, transform .15s ease; pointer-events: none; }
 .plot:hover .plot-tip { opacity: 1; transform: none; }
