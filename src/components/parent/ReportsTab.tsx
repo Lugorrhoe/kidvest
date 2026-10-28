@@ -8,6 +8,7 @@ import { money, pct, units } from '../../engine/format';
 import { marketFor } from '../../engine/game';
 import type { Game, Profile } from '../../engine/types';
 import { cx, Emoji } from '../../lib/ui';
+import { HistoryTimeline } from './HistoryTimeline';
 import { TalkSection } from './TalkSection';
 
 export function ReportsTab() {
@@ -102,6 +103,8 @@ function Report({ p, g }: { p: Profile; g: Game }) {
           </ResponsiveContainer>
         </div>
       </div>
+
+      <HistoryTimeline game={g} market={m} world={world} />
 
       <div className="grid grid-cols-2 gap-6">
         <div className="card card-pad">
