@@ -25,7 +25,7 @@ export function AssetSheet(props: Props) {
   );
 }
 
-function SheetBody({ game, market, ctx, assetId, onClose, onTrade }: Props & { assetId: string }) {
+export function SheetBody({ game, market, ctx, assetId, onClose, onTrade }: Props & { assetId: string }) {
   const { bracket, world } = ctx;
   const a = assetById(game, assetId)!;
   const s = game.season;

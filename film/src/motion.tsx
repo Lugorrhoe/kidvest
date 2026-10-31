@@ -128,7 +128,7 @@ export function ParentTag({ text, start, end, x, y, small }: { text: string; sta
 export interface CursorKey { frame: number; x: number; y: number }
 
 /** Cursor path in stage coordinates; with `cam` the path is in scene coordinates and follows the camera. */
-export function Cursor({ path, clicks = [], start, end, cam }: { path: CursorKey[]; clicks?: number[]; start: number; end: number; cam?: CamKey[] }) {
+export function Cursor({ path, clicks = [], start, end, cam, tone = 'dark' }: { path: CursorKey[]; clicks?: number[]; start: number; end: number; cam?: CamKey[]; tone?: 'dark' | 'light' }) {
   const frame = useCurrentFrame();
   if (frame < start || frame >= end) return null;
   let x = path[0].x, y = path[0].y;
@@ -146,10 +146,11 @@ export function Cursor({ path, clicks = [], start, end, cam }: { path: CursorKey
   const click = clicks.find((c) => frame >= c && frame < c + 16);
   const ring = click === undefined ? 0 : tw(frame, click, click + 16, 0, 1, EASE.out);
   const press = click === undefined ? 1 : tw(frame, click, click + 6, 1, 0.78, EASE.out) * (frame > click + 6 ? 1 / tw(frame, click + 6, click + 14, 1 / 0.78, 1, EASE.out) : 1);
+  const light = tone === 'light';
   return (
-    <div style={{ position: 'absolute', left: x, top: y, opacity: o, pointerEvents: 'none' }}>
-      {click !== undefined && <div style={{ position: 'absolute', left: -14 - ring * 18, top: -14 - ring * 18, width: 28 + ring * 36, height: 28 + ring * 36, borderRadius: '50%', border: '2px solid rgba(255,255,255,.9)', opacity: 1 - ring }} />}
-      <div style={{ position: 'absolute', left: -11, top: -11, width: 22, height: 22, borderRadius: '50%', background: 'rgba(255,255,255,.95)', boxShadow: '0 2px 10px rgba(0,0,0,.35), 0 0 0 2px rgba(20,23,29,.25)', transform: `scale(${press})` }} />
+    <div style={{ position: 'absolute', left: x, top: y, opacity: o, pointerEvents: 'none', zIndex: 50 }}>
+      {click !== undefined && <div style={{ position: 'absolute', left: -14 - ring * 18, top: -14 - ring * 18, width: 28 + ring * 36, height: 28 + ring * 36, borderRadius: '50%', border: `2px solid ${light ? 'rgba(0,101,189,.9)' : 'rgba(255,255,255,.9)'}`, opacity: 1 - ring }} />}
+      <div style={{ position: 'absolute', left: -11, top: -11, width: 22, height: 22, borderRadius: '50%', background: light ? '#fff' : 'rgba(255,255,255,.95)', boxShadow: light ? '0 2px 10px rgba(0,40,80,.25), 0 0 0 3px #0065BD' : '0 2px 10px rgba(0,0,0,.35), 0 0 0 2px rgba(20,23,29,.25)', transform: `scale(${press})` }} />
     </div>
   );
 }

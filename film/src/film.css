@@ -13,7 +13,11 @@
 [data-tip="farm.tree"] .plot[data-asset="farm.tree"] .plot-tip,
 [data-tip="farm.hens"] .plot[data-asset="farm.hens"] .plot-tip,
 [data-tip="farm.pig"] .plot[data-asset="farm.pig"] .plot-tip,
-[data-tip="farm.bees"] .plot[data-asset="farm.bees"] .plot-tip { opacity: 1 !important; }
+[data-tip="farm.bees"] .plot[data-asset="farm.bees"] .plot-tip,
+[data-tip="space.rocket"] .plot[data-asset="space.rocket"] .plot-tip,
+[data-tip="space.greenhouse"] .plot[data-asset="space.greenhouse"] .plot-tip,
+[data-tip="city.cityacc"] .plot[data-asset="city.cityacc"] .plot-tip,
+[data-tip="city.bonds"] .plot[data-asset="city.bonds"] .plot-tip { opacity: 1 !important; }
 
 /* The product body styles do not apply on the stage. */
 body { min-width: 0; background: transparent; }

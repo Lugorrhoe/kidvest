@@ -52,7 +52,7 @@ export default function Home() {
   );
 }
 
-function ProfileCard({ p, g, earned, onClick }: { p: Profile; g?: Game; earned: number; onClick: () => void }) {
+export function ProfileCard({ p, g, earned, onClick }: { p: Profile; g?: Game; earned: number; onClick: () => void }) {
   const w = WORLDS[p.world];
   const dark = w.id !== 'farm';
   let value: string | null = null;

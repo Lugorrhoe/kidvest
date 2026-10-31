@@ -2,6 +2,7 @@ import { loadFont } from '@remotion/google-fonts/Inter';
 import { AbsoluteFill, Composition, Sequence, useCurrentFrame } from 'remotion';
 import '../../src/index.css';
 import './film.css';
+import { Demo } from './demo/Demo';
 import { ChapterLabel, Wordmark } from './motion';
 import { HookChapter } from './scenes/Hook';
 import { LetDoChapter } from './scenes/LetDo';
@@ -40,6 +41,7 @@ const Slice: React.FC = () => (
 export const Root: React.FC = () => (
   <>
     <Composition id="KidvestFilm" component={Film} durationInFrames={TOTAL} fps={FPS} width={WIDTH} height={HEIGHT} />
+    <Composition id="KidvestDemo" component={Demo} durationInFrames={TOTAL} fps={FPS} width={WIDTH} height={HEIGHT} />
     <Composition id="Slice" component={Slice} durationInFrames={dur(SLICE)} fps={FPS} width={WIDTH} height={HEIGHT} />
   </>
 );

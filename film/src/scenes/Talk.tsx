@@ -59,7 +59,7 @@ function ReportsHeader({ opacity }: { opacity: number }) {
   );
 }
 
-function PromptsCard() {
+export function PromptsCard() {
   const world = WORLDS.farm;
   const game = thanja.at[26];
   const prompts = [...game.talk].filter((t) => t.season >= 21).reverse().slice(0, 2);
@@ -80,7 +80,7 @@ function PromptsCard() {
   );
 }
 
-function TalkCard({ clicked }: { clicked: boolean }) {
+export function TalkCard({ clicked }: { clicked: boolean }) {
   return (
     <div className="card card-pad">
       <h3 className="text-lg font-bold">💬 Monthly money talk</h3>
@@ -94,7 +94,7 @@ function TalkCard({ clicked }: { clicked: boolean }) {
   );
 }
 
-function RewardRow() {
+export function RewardRow() {
   const r = rewardAt(26);
   const fmt = (v: number) => money(v, thanja.ctx.world, 3);
   return (
