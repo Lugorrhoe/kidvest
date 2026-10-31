@@ -1,8 +1,9 @@
 import Dexie, { type Table } from 'dexie';
 import { DEFAULT_SCENARIOS } from '../data/scenarios';
+import { buildDemoGame, DEMO_FAMILY } from '../data/demoFamily';
 import { WORLDS } from '../data/worlds';
 import { resolveAssets } from '../engine/assets';
-import { advance, buy, contextFor, marketFor, newGame, normalizeGame } from '../engine/game';
+import { advance, contextFor, marketFor, newGame, normalizeGame } from '../engine/game';
 import { uid } from '../engine/rng';
 import type { AssetDef, Bracket, Game, Profile, Scenario, WorldId } from '../engine/types';
 import { evaluateRewards, type Reward } from '../engine/rewards';
@@ -108,37 +109,12 @@ export async function createProfile(p: { name: string; avatar: string; bracket: 
   return profile;
 }
 
-/**
- * The demo family starts in the middle of a round so the worlds are already full of life.
- * Plans: [assetId, units at the start], then every year part of the new cash is invested again.
- */
-const DEMO: { name: string; avatar: string; bracket: Bracket; world: WorldId; seasons: number; start: [string, number][]; yearly: [string, number][] }[] = [
-  { name: 'Thanja', avatar: '🦊', bracket: 1, world: 'farm', seasons: 20, start: [['farm.cow', 2], ['farm.tree', 1], ['farm.hens', 2], ['farm.pig', 1]], yearly: [['farm.cow', 0.5], ['farm.hens', 0.3]] },
-  { name: 'Noah', avatar: '🐼', bracket: 2, world: 'space', seasons: 16, start: [['space.greenhouse', 1.5], ['space.solar', 1], ['space.rocket', 2], ['space.satellites', 1.6], ['space.crystal', 0.6]], yearly: [['space.greenhouse', 0.4], ['space.rocket', 0.2]] },
-  { name: 'Emilia', avatar: '🦉', bracket: 3, world: 'city', seasons: 12, start: [['city.cityacc', 6], ['city.bonds', 5], ['city.gold', 1.5], ['city.startup', 2]], yearly: [['city.cityacc', 0.5], ['city.bonds', 0.25]] },
-];
-
+/** Seeds the demo family (Thanja, Noah, Emilia) mid-round; the game states come from the pure builder in data/demoFamily.ts. */
 export async function seedDemoFamily() {
   const custom = await db.customAssets.toArray();
-  for (const d of DEMO) {
+  for (const d of DEMO_FAMILY) {
     const p = await createProfile({ name: d.name, avatar: d.avatar, bracket: d.bracket, world: d.world });
-    const sc = DEFAULT_SCENARIOS.find((s) => s.id === WORLDS[d.world].defaultScenarioId)!;
-    const ctx = contextFor(p);
-    let g = newGame(p.id, sc, resolveAssets(sc, custom));
-    const m = marketFor(g);
-    for (const [id, u] of d.start) { const r = buy(g, m, id, u, ctx); if (r.ok) g = r.game; }
-    for (let s = 1; s <= d.seasons; s++) {
-      g = advance(g, m, ctx).game;
-      if (s % 4 === 0) {
-        const cash = g.cash;
-        for (const [id, share] of d.yearly) {
-          const price = m.prices[id][g.season];
-          let u = (cash * share - sc.tradeFee) / price;
-          if (d.bracket === 1) u = Math.floor(u);
-          if (u > 0) { const r = buy(g, m, id, u, ctx); if (r.ok) g = r.game; }
-        }
-      }
-    }
+    const g = buildDemoGame(d, p.id, custom);
     g.lastTick = Date.now();
     await db.games.put(g);
   }

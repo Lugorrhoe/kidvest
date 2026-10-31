@@ -71,7 +71,7 @@ export function Plot({ d, style, game, market, ctx, showDelta, n, onOpen, buildi
   const tipBelow = (parseFloat(String(style.top)) || 0) < 50;
   const nextAt = stage < 4 ? NEXT_AT[stage] : null;
   return (
-    <button onClick={() => onOpen(d.asset.id)} className={cx('plot group absolute text-left', !owned && 'opacity-80')} style={style}>
+    <button data-asset={d.asset.id} onClick={() => onOpen(d.asset.id)} className={cx('plot group absolute text-left', !owned && 'opacity-80')} style={style}>
       <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMax meet" className={cx('absolute inset-x-0 top-0 w-full drop-shadow-sm', !owned && 'opacity-40 grayscale')} style={{ height: 'calc(100% - 26px)' }} aria-hidden>
         {building(Math.max(1, stage))}
       </svg>

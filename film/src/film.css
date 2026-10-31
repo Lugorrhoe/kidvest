@@ -1,0 +1,16 @@
+/* Remotion renders one frame at a time: nothing may depend on the wall clock. */
+*, *::before, *::after { animation: none !important; transition: none !important; }
+
+/* Motion the film drives itself (see motion.tsx). */
+.rain { background-position: var(--rain-pos, 0 0) !important; }
+
+/* Hover cards are opened by the film, not by a mouse. */
+.plot-tip { opacity: 0 !important; transform: none !important; }
+[data-tip="farm.cow"] .plot[data-asset="farm.cow"] .plot-tip,
+[data-tip="farm.tree"] .plot[data-asset="farm.tree"] .plot-tip,
+[data-tip="farm.hens"] .plot[data-asset="farm.hens"] .plot-tip,
+[data-tip="farm.pig"] .plot[data-asset="farm.pig"] .plot-tip,
+[data-tip="farm.bees"] .plot[data-asset="farm.bees"] .plot-tip { opacity: 1 !important; }
+
+/* The product body styles do not apply on the stage. */
+body { min-width: 0; background: transparent; }
