@@ -11,7 +11,7 @@ How do you explain 2008 to a seven-year-old? You don't. You let her live through
 The entire film is built around a single real year, 2008, seen three times:
 
 1. **SHOW**: 2008 as a dip on a 97-year chart, then as an honest but vague forecast on a sunny farm ("Farmer Jo warns: this could be a very stormy year").
-2. **LET DO**: 2008 as weather. Rain, then storm, red chips on the cows, a child who presses "Next season" and holds. Then spring 2009, green chips, a badge, a real reward.
+2. **LET DO**: 2008 as weather. Storm after storm, red chips on the cows, a child who presses "Next season" and holds. Then the real-life reward her parents set for exactly that, and a sunny 2009 with green chips.
 3. **TALK**: 2008 by its name, for the parents only. The Reports timeline reveals "Year 6 was 2008, the global financial crisis. Your child held on through the storm," with a conversation starter.
 
 Everything the audience sees is the real product rendering real engine states. No invented interactions. The only deliberate action the child takes is to keep going: that is the educational thesis (patience over trading, behaviour over luck), so the film does not glamorise buying and selling.

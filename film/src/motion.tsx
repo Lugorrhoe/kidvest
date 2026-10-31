@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { AbsoluteFill, Easing, interpolate, useCurrentFrame } from 'remotion';
-import { Logo } from '../../src/lib/ui';
+import { Emoji, Logo } from '../../src/lib/ui';
 import { HEIGHT, WIDTH } from './timeline';
 
 /* ------------------------------------------------------------------ easing and tweens */
@@ -104,10 +104,10 @@ export function ChapterLabel({ text, start, end = Infinity }: { text: string; st
   return <div style={{ position: 'absolute', top: 48, left: 72, fontSize: 18, fontWeight: 600, letterSpacing: '0.32em', color: 'rgba(255,255,255,.6)', opacity: o }}>{text}</div>;
 }
 
-export function Wordmark({ start }: { start: number }) {
+export function Wordmark({ start, end = Infinity }: { start: number; end?: number }) {
   const frame = useCurrentFrame();
-  if (frame < start) return null;
-  return <div style={{ position: 'absolute', left: 72, bottom: 44, opacity: 0.45 * fadeIn(frame, start, 20) }}><Logo dark small /></div>;
+  if (frame < start || frame >= end) return null;
+  return <div style={{ position: 'absolute', left: 72, bottom: 44, opacity: 0.45 * Math.min(fadeIn(frame, start, 20), end === Infinity ? 1 : fadeOut(frame, end, 16)) }}><Logo dark small /></div>;
 }
 
 /** Amber annotation styled like the Reports tab's "Real history replayed (only you see this)" tag. */
@@ -168,6 +168,47 @@ export function ModalCard({ start, end, width = 760, children }: { start: number
         {children}
       </div>
     </AbsoluteFill>
+  );
+}
+
+/* ------------------------------------------------------------------ celebration */
+const CONFETTI = ['#ffd43b', '#ff6b6b', '#4dabf7', '#51cf66', '#cc5de8', '#ff922b', '#20c997'];
+
+/** The product's confetti burst, driven by frames (same colours and spread as components/Confetti.tsx). */
+export function ConfettiBurst({ start, count = 56, duration = 84 }: { start: number; count?: number; duration?: number }) {
+  const frame = useCurrentFrame();
+  if (frame < start || frame > start + duration + 30) return null;
+  return (
+    <AbsoluteFill style={{ pointerEvents: 'none', overflow: 'hidden' }}>
+      {Array.from({ length: count }, (_, i) => {
+        const delay = (i % 9) * 2.2;
+        const d = duration * (0.86 + (i % 5) * 0.07);
+        const t = tw(frame, start + delay, start + delay + d, 0, 1, Easing.bezier(0.2, 0.6, 0.4, 1));
+        if (t <= 0) return null;
+        const y = -0.12 * HEIGHT + t * 1.17 * HEIGHT;
+        const sway = Math.sin((frame - start) * 0.18 + i) * 22;
+        return (
+          <span key={i} style={{ position: 'absolute', left: `${(i * 37 + 11) % 100}%`, top: 0, width: 6 + (i % 3) * 3, height: 10 + (i % 4) * 3, background: CONFETTI[i % CONFETTI.length], borderRadius: i % 2 ? '50%' : 2, transform: `translate(${sway}px, ${y}px) rotate(${t * 720 + i * 40}deg)`, opacity: t > 0.8 ? (1 - t) / 0.2 : 1 }} />
+        );
+      })}
+    </AbsoluteFill>
+  );
+}
+
+/** The Play page's toast, sliding in at the stage's bottom right. */
+export function Toast({ start, end, emoji, title, sub }: { start: number; end: number; emoji: string; title: string; sub: string }) {
+  const frame = useCurrentFrame();
+  if (frame < start || frame >= end) return null;
+  const o = Math.min(fadeIn(frame, start, 14), fadeOut(frame, end, 14));
+  const dx = tw(frame, start, start + 18, 40, 0, EASE.enter);
+  return (
+    <div className="card" style={{ position: 'absolute', right: 72, bottom: 96, width: 340, padding: 18, display: 'flex', alignItems: 'center', gap: 14, opacity: o, transform: `translateX(${dx}px)`, boxShadow: '0 24px 60px rgba(0,0,0,.4)' }}>
+      <Emoji e={emoji} className="text-4xl" />
+      <div>
+        <div className="text-xs font-semibold uppercase tracking-wide text-amber-600">{title}</div>
+        <div className="text-lg font-bold">{sub}</div>
+      </div>
+    </div>
   );
 }
 

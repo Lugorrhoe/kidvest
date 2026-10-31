@@ -2,7 +2,8 @@ import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import { Scene } from '../../../src/components/Scene';
 import { YearReportView } from '../../../src/components/YearModals';
 import { yearReport } from '../../../src/engine/forecast';
-import { Camera, Caption, Cursor, EASE, ModalCard, ParentTag, ProductFrame, Stage, focus, tw, within } from '../motion';
+import { SP_POINTS, hillPoints, lerpPts, toPath } from '../dataLine';
+import { Camera, Caption, Cursor, EASE, ModalCard, ParentTag, ProductFrame, Stage, camAt, focus, tw, within } from '../motion';
 import { HEIGHT, SHOT, WIDTH } from '../timeline';
 import { emilia, noah, thanja } from '../states';
 
@@ -49,13 +50,24 @@ function FarmShots() {
     { frame: s5[0] + 60, scale: REST * 1.05, x: 0, y: 0 },
     { frame: s5[1], scale: REST * 1.05, x: 0, y: 0 },
   ];
-  const reveal = tw(frame, s3[0], s3[0] + 40, 1, 0, EASE.out);
+  const reveal = tw(frame, s3[0] + 18, s3[0] + 70, 1, 0, EASE.inOut);
+  // T1: the hook's data line becomes the farm's horizon, following the camera, then hands over to the real hill
+  const morph = tw(frame, s3[0], s3[0] + 50, 0, 1, EASE.inOut);
+  const cam = camAt(frame, keys);
+  const hill = hillPoints((WIDTH - 1240) / 2, SCENE_TOP).map((p) => ({ x: WIDTH / 2 + (p.x - WIDTH / 2) * cam.scale + cam.x, y: HEIGHT / 2 + (p.y - HEIGHT / 2) * cam.scale + cam.y }));
+  const line = lerpPts(SP_POINTS, hill, morph);
+  const lineO = tw(frame, s3[0] + 60, s3[0] + 95, 1, 0, EASE.out);
   return (
     <>
       <Camera keys={keys}>
         <FarmScene season={20} since={20} tip={tip} />
         <AbsoluteFill style={{ background: '#14171d', opacity: reveal }} />
       </Camera>
+      {lineO > 0 && (
+        <svg style={{ position: 'absolute', inset: 0, opacity: lineO }} width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`}>
+          <path d={toPath(line)} fill="none" stroke="rgba(255,255,255,.92)" strokeWidth={2.5 + morph * 1.5} strokeLinejoin="round" strokeLinecap="round" />
+        </svg>
+      )}
       <Cursor cam={keys} start={s4[0] + 10} end={s4[1] - 10} path={[{ frame: s4[0] + 10, x: barn.x + 40, y: barn.y + 150 }, { frame: s4[0] + 30, x: barn.x + 46, y: barn.y + 36 }, { frame: s4[0] + 118, x: barn.x + 46, y: barn.y + 36 }, { frame: s4[0] + 150, x: pig.x + 30, y: pig.y + 10 }]} />
       <ParentTag start={s4[0] + 60} end={s4[0] + 122} x={WIDTH / 2 - 440} y={HEIGHT / 2 + 70} text="Cow = equity index fund, distributing" />
       <ParentTag start={s4[0] + 142} end={s4[1] - 14} x={WIDTH / 2 + 160} y={HEIGHT / 2 + 40} text="Pig = small-cap stocks" />
