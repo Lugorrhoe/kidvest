@@ -7,6 +7,7 @@
     "render": "remotion render src/index.ts KidvestFilm out/kidvest-90s.mp4 --codec h264 --crf 16",
     "render:slice": "remotion render src/index.ts Slice out/slice.mp4 --codec h264 --crf 16",
     "render:demo": "remotion render src/index.ts KidvestDemo out/kidvest-demo-90s.mp4 --codec h264 --crf 16",
+    "render:final": "remotion render src/index.ts KidvestDemoV2 out/kidvest-final-90s.mp4 --codec h264 --crf 16",
     "still": "remotion still src/index.ts"
   },
   "dependencies": {

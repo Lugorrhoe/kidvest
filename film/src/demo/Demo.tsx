@@ -41,7 +41,7 @@ const P = {
   cardEmilia: { x: 1100, y: 360 },
   parentsBtn: { x: 1228, y: 42 },
   exit: { x: 1300, y: 30 },
-  nextSeason: { x: 1180, y: 214 },
+  nextSeason: { x: 1157, y: 307 },
   hens: { x: 1232, y: 600 },
   rocket: { x: 440, y: 720 },
   cityacc: { x: 690, y: 590 },

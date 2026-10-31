@@ -3,6 +3,7 @@ import { AbsoluteFill, Composition, Sequence, useCurrentFrame } from 'remotion';
 import '../../src/index.css';
 import './film.css';
 import { Demo } from './demo/Demo';
+import { DemoV2 } from './demo/DemoV2';
 import { ChapterLabel, Wordmark } from './motion';
 import { HookChapter } from './scenes/Hook';
 import { LetDoChapter } from './scenes/LetDo';
@@ -42,6 +43,7 @@ export const Root: React.FC = () => (
   <>
     <Composition id="KidvestFilm" component={Film} durationInFrames={TOTAL} fps={FPS} width={WIDTH} height={HEIGHT} />
     <Composition id="KidvestDemo" component={Demo} durationInFrames={TOTAL} fps={FPS} width={WIDTH} height={HEIGHT} />
+    <Composition id="KidvestDemoV2" component={DemoV2} durationInFrames={TOTAL} fps={FPS} width={WIDTH} height={HEIGHT} />
     <Composition id="Slice" component={Slice} durationInFrames={dur(SLICE)} fps={FPS} width={WIDTH} height={HEIGHT} />
   </>
 );
