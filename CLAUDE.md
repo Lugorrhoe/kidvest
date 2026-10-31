@@ -118,6 +118,10 @@ src/
 - Tests: extend `src/engine/engine.test.ts`; the calibration test prints outcomes of simple strategies per scenario, useful when tuning goals or fees.
 - Commit only reviewed, tested code. `npm test` and `npm run build` must pass; the Pages workflow runs both.
 
+## 6b. The pitch film (`film/`)
+
+A 90-second product film built with Remotion 4 that renders the product's own React components from deterministic engine states (no screen recording, no mocks). Separate npm package: `cd film && npm install`, then `npm run render` writes `film/out/kidvest-90s.mp4` (1920 x 1080, 30 fps, exactly 90 s); `npm run studio` opens the Remotion studio; `npx remotion still src/index.ts KidvestFilm out/x.png --frame=N` renders a review frame. `film/TREATMENT.md` and `film/STORYBOARD.md` describe the story (SHOW, LET DO, TALK around the year 2008); `src/timeline.ts` holds every shot's frames, `src/motion.tsx` the primitives, `src/states.ts` the game states (demo family via `data/demoFamily.ts`, a real-life reward evaluated by the engine), `src/scenes/*` one file per chapter. The product's CSS animations are scrubbed per frame via `--t` in `film.css`. No audio by decision (the presenter speaks live). `film/tools/probe-demo-seasons.ts` prints what the engine does season by season.
+
 ## 7. Visual QA approach that worked
 
 Headless Chromium is available via the npm package `@sparticuz/chromium` with `puppeteer-core` (no browser download needed). It cannot render colour emoji; for screenshots, inject a monochrome `@fontsource/noto-emoji` stylesheet (copied into `dist/t/`) and force `.emoji { font-family: 'Noto Emoji' }`. Scripts used: start `vite preview --port 4173`, drive the UI by clicking buttons by text, screenshot the `div.scene` or `.card` elements. Colour emoji were therefore never visually verified by the AI session; Lukas checks them on Windows.
