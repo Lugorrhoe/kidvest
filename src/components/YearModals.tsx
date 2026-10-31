@@ -6,7 +6,8 @@ import { cx, Emoji } from '../lib/ui';
 
 export function YearReportView({ report, ctx, onClose, isNew }: { report: YearReport; ctx: Context; onClose: () => void; isNew: boolean }) {
   const { world, bracket } = ctx;
-  const dark = world.id === 'space';
+  // the farm hero gradient is light; space and city are dark
+  const dark = world.id !== 'farm';
   return (
     <div>
       <div className={cx('rounded-t-2xl p-7', dark ? 'text-white' : 'text-ink-900')} style={{ background: world.colors.hero }}>

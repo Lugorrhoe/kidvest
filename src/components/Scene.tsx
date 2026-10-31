@@ -59,40 +59,94 @@ const SKY: Record<string, Record<Weather, [string, string]>> = {
   city: { sunny: ['#a8dcff', '#f1faff'], cloudy: ['#c3d5e4', '#eef3f7'], rain: ['#a2b0bd', '#dbe2e8'], storm: ['#5f6b78', '#adb7c1'] },
 };
 
-function Clouds({ dark }: { dark: boolean }) {
+/** Two-tone clouds that drift slowly. */
+function Clouds({ dark, soft = false }: { dark: boolean; soft?: boolean }) {
   const f = dark ? '#8a96a6' : '#ffffff';
+  const shade = dark ? '#6f7b8b' : '#d9e6f2';
+  const list: [number, number, number, number][] = soft ? [[220, 70, 0.9, 0], [760, 48, 0.75, 1], [1040, 90, 0.6, 2]] : [[180, 60, 1, 0], [520, 40, 1.3, 1], [880, 70, 1.1, 2], [1080, 35, 0.9, 3]];
   return (
-    <g opacity={dark ? 0.95 : 0.9}>
-      {[[180, 60, 1], [520, 40, 1.3], [880, 70, 1.1], [1080, 35, 0.9]].map(([x, y, k], i) => (
-        <g key={i} transform={`translate(${x} ${y}) scale(${k})`}>
-          <ellipse cx="0" cy="0" rx="60" ry="22" fill={f} />
-          <ellipse cx="-34" cy="6" rx="36" ry="16" fill={f} />
-          <ellipse cx="38" cy="8" rx="40" ry="16" fill={f} />
-          <ellipse cx="6" cy="-14" rx="34" ry="20" fill={f} />
+    <g opacity={dark ? 0.95 : soft ? 0.85 : 0.95}>
+      {list.map(([x, y, k, d], i) => (
+        <g key={i} className="anim-cloud" style={{ animationDelay: `${-d * 7}s` }} transform={`translate(${x} ${y}) scale(${k})`}>
+          <ellipse cx="0" cy="4" rx="62" ry="20" fill={shade} />
+          <ellipse cx="-34" cy="10" rx="36" ry="14" fill={shade} />
+          <ellipse cx="40" cy="12" rx="40" ry="14" fill={shade} />
+          <ellipse cx="0" cy="0" rx="60" ry="20" fill={f} />
+          <ellipse cx="-34" cy="6" rx="36" ry="14" fill={f} />
+          <ellipse cx="38" cy="8" rx="40" ry="14" fill={f} />
+          <ellipse cx="6" cy="-12" rx="34" ry="18" fill={f} />
         </g>
       ))}
     </g>
   );
 }
 
+const FARM_TINT: Record<Weather, string> = { sunny: 'rgba(0,0,0,0)', cloudy: 'rgba(120,140,165,.14)', rain: 'rgba(70,90,115,.28)', storm: 'rgba(30,40,60,.42)' };
+
+/** Layered landscape: sky, sun, far hills in haze, hedgerow and path, mown foreground field with a fence. */
 function FarmBackdrop({ w }: { w: Weather }) {
   const [a, b] = SKY.farm[w];
+  const flowers = Array.from({ length: 30 }, (_, i) => ({ x: (i * 173 + 40) % 1200, y: 236 + ((i * 97) % 214), c: ['#ffd43b', '#f783ac', '#ffffff', '#ff8787'][i % 4] }));
   return (
     <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1200 470" preserveAspectRatio="xMidYMid slice" aria-hidden>
       <defs>
         <linearGradient id="fsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={a} /><stop offset="1" stopColor={b} /></linearGradient>
-        <linearGradient id="fgrass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#9fd977" /><stop offset="1" stopColor="#74b84f" /></linearGradient>
-        <radialGradient id="fsun"><stop offset="0" stopColor="#fff3b0" /><stop offset=".55" stopColor="#ffd43b" /><stop offset="1" stopColor="#ffd43b" stopOpacity="0" /></radialGradient>
+        <linearGradient id="ffield" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8fcf6d" /><stop offset="1" stopColor="#6aae48" /></linearGradient>
+        <linearGradient id="fmid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#a6d98a" /><stop offset="1" stopColor="#8fcb70" /></linearGradient>
+        <radialGradient id="fsun"><stop offset="0" stopColor="#fff8d6" /><stop offset=".35" stopColor="#ffe066" /><stop offset=".6" stopColor="#ffd43b" stopOpacity=".55" /><stop offset="1" stopColor="#ffd43b" stopOpacity="0" /></radialGradient>
+        <pattern id="fstripes" width="72" height="72" patternUnits="userSpaceOnUse" patternTransform="rotate(-6)"><rect width="36" height="72" fill="#ffffff" opacity=".07" /></pattern>
       </defs>
       <rect width="1200" height="470" fill="url(#fsky)" />
-      {w === 'sunny' && <circle cx="1090" cy="62" r="70" fill="url(#fsun)" />}
-      {w !== 'sunny' && <Clouds dark={w === 'storm' || w === 'rain'} />}
-      {w === 'storm' && <polyline points="760,70 735,120 760,118 738,170" fill="none" stroke="#ffe066" strokeWidth="5" strokeLinejoin="round" />}
-      <path d="M0 150 C 160 95 320 120 460 105 C 640 85 760 130 900 108 C 1020 92 1120 112 1200 100 L1200 470 L0 470 Z" fill="#b9e3a1" />
-      <path d="M0 175 C 200 140 380 165 600 150 C 820 135 1000 168 1200 150 L1200 470 L0 470 Z" fill="url(#fgrass)" />
-      {Array.from({ length: 31 }, (_, i) => <rect key={i} x={i * 40 + 6} y="160" width="6" height="22" rx="2" fill="#b07a43" />)}
-      <rect x="0" y="166" width="1200" height="4" fill="#c58f55" />
-      <rect x="0" y="176" width="1200" height="4" fill="#c58f55" />
+      {w === 'sunny' && <circle cx="1040" cy="78" r="110" fill="url(#fsun)" />}
+      {w === 'sunny' && <circle cx="1040" cy="78" r="34" fill="#fff6c2" />}
+      <Clouds dark={w === 'storm' || w === 'rain'} soft={w === 'sunny'} />
+      {w === 'storm' && <polyline points="760,40 735,110 762,106 736,180" fill="none" stroke="#ffe066" strokeWidth="5" strokeLinejoin="round" opacity=".95" />}
+
+      {/* far hills in haze */}
+      <path d="M0 148 C 140 110 260 120 400 110 C 560 98 660 132 820 110 C 960 92 1080 110 1200 98 L1200 470 L0 470 Z" fill="#bcdcb0" />
+      {[[120, 141], [146, 135], [172, 139], [640, 126], [664, 120], [688, 125], [1010, 108], [1036, 104]].map(([x, y], i) => <circle key={i} cx={x} cy={y} r="7" fill="#a4cb97" />)}
+      {/* windmill on the far ridge */}
+      <g transform="translate(905 88)">
+        <polygon points="-7,34 7,34 4,0 -4,0" fill="#c9bfae" />
+        <polygon points="-5,34 5,34 3,6 -3,6" fill="#e6ddcc" />
+        <g className="anim-mill" style={{ transformOrigin: '0px 2px' }}>
+          <path d="M0 2 L0 -26 M0 2 L24 16 M0 2 L-24 16" stroke="#8b7f6c" strokeWidth="2.5" strokeLinecap="round" />
+        </g>
+        <circle cy="2" r="2.5" fill="#6f655a" />
+      </g>
+
+      {/* mid hill with hedgerow */}
+      <path d="M0 180 C 200 150 380 172 600 158 C 820 144 1000 176 1200 156 L1200 470 L0 470 Z" fill="url(#fmid)" />
+      {Array.from({ length: 24 }, (_, i) => <ellipse key={i} cx={i * 52 + 20} cy={166 + Math.sin(i) * 5} rx="18" ry="11" fill="#5e9f45" />)}
+      {Array.from({ length: 24 }, (_, i) => <ellipse key={i} cx={i * 52 + 14} cy={162 + Math.sin(i) * 5} rx="11" ry="8" fill="#73b556" />)}
+
+      {/* foreground field, mown stripes, path */}
+      <path d="M0 200 C 180 182 400 196 620 186 C 840 176 1020 196 1200 184 L1200 470 L0 470 Z" fill="url(#ffield)" />
+      <path d="M0 200 C 180 182 400 196 620 186 C 840 176 1020 196 1200 184 L1200 470 L0 470 Z" fill="url(#fstripes)" />
+      <path d="M560 190 C 520 270 470 360 430 470 L 520 470 C 540 370 580 280 610 190 Z" fill="#d9bb8c" />
+      <path d="M572 190 C 540 270 500 360 470 470 L 492 470 C 520 360 560 280 596 190 Z" fill="#e6cc9f" opacity=".7" />
+
+      {/* fence along the field edge */}
+      {Array.from({ length: 29 }, (_, i) => (
+        <g key={i} transform={`translate(${i * 42 + 12} ${184 + Math.sin(i * 0.7) * 2})`}>
+          <rect x="0" y="0" width="7" height="28" rx="2" fill="#b07a43" />
+          <rect x="4" y="0" width="3" height="28" rx="1" fill="#8c5a2b" />
+          <polygon points="0,0 3.5,-4 7,0" fill="#8c5a2b" />
+        </g>
+      ))}
+      <rect x="0" y="191" width="1200" height="5" fill="#c58f55" />
+      <rect x="0" y="196" width="1200" height="1.5" fill="#8c5a2b" opacity=".6" />
+      <rect x="0" y="203" width="1200" height="5" fill="#c58f55" />
+      <rect x="0" y="208" width="1200" height="1.5" fill="#8c5a2b" opacity=".6" />
+
+      {/* wildflowers */}
+      {flowers.map((f, i) => (
+        <g key={i} opacity=".9">
+          <rect x={f.x} y={f.y} width="1.5" height="9" fill="#4f9a3a" />
+          <circle cx={f.x + 0.75} cy={f.y - 1} r="2.6" fill={f.c} />
+        </g>
+      ))}
+      <rect width="1200" height="470" fill={FARM_TINT[w]} />
     </svg>
   );
 }
@@ -108,10 +162,20 @@ function SpaceBackdrop({ w }: { w: Weather }) {
         <radialGradient id="sglow"><stop offset="0" stopColor="#ffd8a8" stopOpacity=".9" /><stop offset="1" stopColor="#ffd8a8" stopOpacity="0" /></radialGradient>
       </defs>
       <rect width="1200" height="470" fill="url(#ssky)" />
+      {/* nebulae for depth */}
+      <ellipse cx="260" cy="140" rx="260" ry="120" fill="#7048e8" opacity=".16" />
+      <ellipse cx="900" cy="90" rx="300" ry="110" fill="#e64980" opacity=".09" />
+      <ellipse cx="620" cy="60" rx="220" ry="80" fill="#15aabf" opacity=".07" />
       {stars.map((s, i) => <circle key={i} className="twinkle" style={{ animationDelay: `${s.d}s` }} cx={s.x} cy={s.y} r={s.r} fill="#fff" />)}
       {w === 'sunny' && <circle cx="1120" cy="40" r="150" fill="url(#sglow)" />}
+      {/* distant moon */}
+      <circle cx="160" cy="88" r="26" fill="#cfc4ff" opacity=".9" />
+      <circle cx="150" cy="80" r="6" fill="#b8aaf2" opacity=".8" />
+      <circle cx="170" cy="96" r="4" fill="#b8aaf2" opacity=".8" />
       <ellipse cx="600" cy="1010" rx="900" ry="620" fill="url(#splanet)" />
+      <ellipse cx="600" cy="1010" rx="900" ry="620" fill="none" stroke="#b197fc" strokeOpacity=".5" strokeWidth="3" />
       <ellipse cx="600" cy="420" rx="760" ry="34" fill="none" stroke="#b197fc" strokeOpacity=".35" strokeWidth="6" />
+      <ellipse cx="600" cy="420" rx="700" ry="26" fill="none" stroke="#d0bfff" strokeOpacity=".18" strokeWidth="2" />
     </svg>
   );
 }
@@ -125,13 +189,29 @@ function CityBackdrop({ w }: { w: Weather }) {
         <linearGradient id="csky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={a} /><stop offset="1" stopColor={b} /></linearGradient>
         <radialGradient id="csun"><stop offset="0" stopColor="#fff3b0" /><stop offset=".55" stopColor="#ffd43b" /><stop offset="1" stopColor="#ffd43b" stopOpacity="0" /></radialGradient>
       </defs>
+      <defs>
+        <pattern id="cwin" width="14" height="18" patternUnits="userSpaceOnUse"><rect x="3" y="4" width="6" height="8" fill="#fff8d6" opacity=".55" /></pattern>
+      </defs>
       <rect width="1200" height="470" fill="url(#csky)" />
       {w === 'sunny' && <circle cx="1090" cy="58" r="64" fill="url(#csun)" />}
-      {w !== 'sunny' && <Clouds dark={w === 'storm' || w === 'rain'} />}
-      {back.map((h, i) => <rect key={i} x={i * 62} y={200 - h} width="54" height={h + 300} fill="#7b93a8" opacity=".28" />)}
-      {back.map((h, i) => <rect key={`f${i}`} x={i * 62 + 28} y={240 - h * 0.7} width="40" height={h + 300} fill="#4f6578" opacity=".22" />)}
-      <rect x="0" y="440" width="1200" height="30" fill="#495057" />
-      {Array.from({ length: 24 }, (_, i) => <rect key={i} x={i * 52 + 10} y="453" width="26" height="4" fill="#f1f3f5" />)}
+      <Clouds dark={w === 'storm' || w === 'rain'} soft={w === 'sunny'} />
+      {/* far hills in haze */}
+      <path d="M0 230 C 200 190 380 215 600 195 C 820 175 1000 215 1200 190 L1200 470 L0 470 Z" fill="#b7c9d8" opacity=".55" />
+      {back.map((h, i) => <rect key={i} x={i * 62} y={200 - h} width="54" height={h + 300} fill="#7b93a8" opacity=".3" />)}
+      {back.map((h, i) => <rect key={`w${i}`} x={i * 62} y={200 - h} width="54" height={h + 300} fill="url(#cwin)" opacity=".35" />)}
+      {back.map((h, i) => <rect key={`f${i}`} x={i * 62 + 28} y={240 - h * 0.7} width="40" height={h + 300} fill="#4f6578" opacity=".24" />)}
+      {/* street trees */}
+      {Array.from({ length: 11 }, (_, i) => (
+        <g key={i} transform={`translate(${i * 118 + 50} 410)`}>
+          <rect x="-2.5" y="8" width="5" height="22" fill="#6b4423" />
+          <circle cx="0" cy="4" r="14" fill="#5e9f45" />
+          <circle cx="-7" cy="-2" r="10" fill="#73b556" />
+          <circle cx="7" cy="-1" r="9" fill="#4f9a3a" />
+        </g>
+      ))}
+      <rect x="0" y="436" width="1200" height="34" fill="#495057" />
+      <rect x="0" y="436" width="1200" height="3" fill="#6b7280" />
+      {Array.from({ length: 24 }, (_, i) => <rect key={i} x={i * 52 + 10} y="452" width="26" height="4" fill="#f1f3f5" />)}
     </svg>
   );
 }

@@ -139,6 +139,7 @@ Returns: Damodaran, *Historical Returns on Stocks, Bonds and Bills: 1928-2025* (
 - No server, so no real e-mail sending; the talk reminder relies on the .ics and in-app banners.
 - Desktop only; no German UI; no accessibility audit beyond semantic buttons and `aria-hidden` on decorative emoji.
 - All three worlds have illustrated buildings with four build-out stages (since 28 Oct 2026). Custom assets fall back to a generic module (space) or shop (city). The farm keeps fixed slots; space and city lay plots out dynamically in two rows.
+- Farm art was redone on 31 Oct 2026: a layered landscape (sky, sun, hazy far hills with a windmill, hedgerow, mown foreground field with fence and path, weather tint overlay) and shaded buildings with ground shadows and dirt aprons (`FarmScene.tsx` palette `C`, helpers `Shadow`, `Dirt`, `Planks`, `Tuft`). Keep the fence at viewBox y ≈ 190 so the plot rows stand on the field. Space got nebulae and a moon, City far hills, lit windows and street trees. Hero gradients: only the farm is light, so `dark = world.id !== 'farm'` for text on them.
 - The achievements "Storm survivor"/"Patience pays" were easy to earn early; thresholds were tightened once, re-check with the calibration test if gameplay changes.
 - Custom scenarios with `startYear: 'random'` drop story events on new rounds by design.
 - Backups are JSON exports; there is no cloud sync. Deleting a child deletes its rewards and game.

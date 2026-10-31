@@ -85,6 +85,14 @@ body {
   .card { box-shadow: none; border-color: #dfe3e8; break-inside: avoid; }
 }
 
+/* ---------- landscape animations ---------- */
+@keyframes cloud-drift { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(14px); } }
+.anim-cloud { animation: cloud-drift 22s ease-in-out infinite; }
+@keyframes mill { to { transform: rotate(360deg); } }
+.anim-mill { animation: mill 14s linear infinite; }
+@keyframes smoke { 0% { transform: translate(0, 0) scale(.7); opacity: .7; } 100% { transform: translate(6px, -22px) scale(1.4); opacity: 0; } }
+.anim-smoke { animation: smoke 3.2s ease-out infinite; }
+
 /* ---------- space and city animations ---------- */
 @keyframes drift { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 30% { transform: translate(3px, -5px) rotate(4deg); } 65% { transform: translate(-3px, -2px) rotate(-4deg); } }
 .anim-drift { display: inline-block; animation: drift 4.2s ease-in-out infinite; }
