@@ -69,13 +69,13 @@ function Greenhouse({ stage }: { stage: number }) {
       <circle cx={cx} cy="104" r={r * 0.13} fill="#94d82d" />
     </g>
   );
-  const tube = (x1: number, x2: number) => <rect x={x1} y="98" width={x2 - x1} height="8" rx="4" fill="rgba(102,217,232,.3)" stroke="#66d9e8" strokeWidth="1" />;
+  const tube = (x1: number, x2: number, i: number) => <rect key={`t${i}`} x={x1} y="98" width={x2 - x1} height="8" rx="4" fill="rgba(102,217,232,.3)" stroke="#66d9e8" strokeWidth="1" />;
   return (
     <g>
       {stage === 1 && dome(100, 26)}
       {stage === 2 && dome(100, 36)}
-      {stage === 3 && <g>{tube(90, 115)}{dome(68, 32)}{dome(136, 25)}</g>}
-      {stage >= 4 && <g>{tube(76, 92)}{tube(130, 142)}{dome(52, 27)}{dome(106, 36)}{dome(162, 22)}</g>}
+      {stage === 3 && <g>{tube(90, 115, 1)}{dome(68, 32, 1)}{dome(136, 25, 2)}</g>}
+      {stage >= 4 && <g>{tube(76, 92, 1)}{tube(130, 142, 2)}{dome(52, 27, 1)}{dome(106, 36, 2)}{dome(162, 22, 3)}</g>}
       <Platform w={176} />
     </g>
   );

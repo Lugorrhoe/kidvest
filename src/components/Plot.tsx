@@ -69,6 +69,9 @@ export function Plot({ d, style, game, market, ctx, showDelta, n, onOpen, buildi
   const w = weatherOf(d.asset.risk);
   const placed = spots(shown);
   const tipBelow = (parseFloat(String(style.top)) || 0) < 50;
+  // keep the hover card inside the scene: plots near an edge get an edge-aligned card
+  const centerPct = (parseFloat(String(style.left)) || 0) + (parseFloat(String(style.width)) || 30) / 2;
+  const tipAlign = centerPct < 30 ? 'left-0' : centerPct > 70 ? 'right-0' : 'left-1/2 -translate-x-1/2';
   const nextAt = stage < 4 ? NEXT_AT[stage] : null;
   return (
     <button data-asset={d.asset.id} onClick={() => onOpen(d.asset.id)} className={cx('plot group absolute text-left', !owned && 'opacity-80')} style={style}>
@@ -100,7 +103,7 @@ export function Plot({ d, style, game, market, ctx, showDelta, n, onOpen, buildi
       </span>
 
       {/* hover card */}
-      <div className={cx('plot-tip absolute left-1/2 z-30 w-64 -translate-x-1/2 rounded-2xl bg-ink-900 p-3 text-left text-white shadow-lg', tipBelow ? 'top-[88%]' : 'bottom-[88%]')}>
+      <div className={cx('plot-tip absolute z-30 w-64 rounded-2xl bg-ink-900 p-3 text-left text-white shadow-lg', tipAlign, tipBelow ? 'top-[88%]' : 'bottom-[88%]')}>
         <div className="flex items-center gap-2">
           <Emoji e={d.asset.emoji} className="text-2xl" />
           <div>

@@ -34,7 +34,7 @@ export default function Home() {
         ) : (
           <>
             <h1 className="mt-6 text-4xl font-extrabold tracking-tight">Who is playing today?</h1>
-            <p className="mt-2 text-ink-600">Pick your profile to continue your round.</p>
+            <p className="mt-2 text-ink-600">Pick your profile to continue your round. First time here? Each world shows you around when you open it, and the 🧭 Tour button brings the tour back any time.</p>
             <div className="mt-8 grid grid-cols-3 gap-6">
               {profiles.map((p) => <ProfileCard key={p.id} p={p} g={gameOf(p.id)} earned={earned.filter((r) => r.profileId === p.id).length} onClick={() => nav(`/play/${p.id}`)} />)}
               <Link to="/parent" className="flex min-h-[220px] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-ink-200 text-ink-500 transition hover:border-ink-400 hover:text-ink-700">
@@ -102,7 +102,22 @@ function Welcome({ onDemo, onParent }: { onDemo: () => void; onParent: () => voi
           </div>
         </div>
       </div>
-      <div className="mt-8 grid grid-cols-3 gap-6">
+      <div className="mt-6 grid grid-cols-3 gap-4">
+        {[
+          ['1', '🔒', 'Parents set up a child', 'Pick a world for their age in the parent area, or try the demo family to look around first.'],
+          ['2', '🌦️', 'The child plays, one year a day', 'Four seasons of real market history in disguise: buy, hold, live through storms, save for goals.'],
+          ['3', '💬', 'Then talk', 'Parents see the real years, get conversation prompts and a monthly reminder to sit down together.'],
+        ].map(([n, e, title, text]) => (
+          <div key={n} className="card flex items-start gap-3 p-4">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink-900 text-sm font-extrabold text-white">{n}</span>
+            <div>
+              <div className="font-bold"><Emoji e={e} /> {title}</div>
+              <div className="mt-0.5 text-sm text-ink-600">{text}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-6 grid grid-cols-3 gap-6">
         {WORLD_LIST.map((w) => (
           <div key={w.id} className="overflow-hidden rounded-3xl shadow-card">
             <div className={w.id === 'farm' ? 'p-6 text-ink-900' : 'p-6 text-white'} style={{ background: w.colors.hero }}>

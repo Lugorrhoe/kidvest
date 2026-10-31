@@ -72,7 +72,8 @@ src/
     FarmScene.tsx       farm buildings: barn, coop, mud pen, hives, orchard, farmhouse; fixed slot layout
     SpaceScene.tsx      space modules: solar array, greenhouse domes, hangar, dishes, launch pad, crystal rig, fuel depot, StationCore
     CityScene.tsx       city buildings: towers, HQ, city hall, garage, vault, row houses, bank branch, CityBase
-    Tour.tsx            guided first-run tour (4 spotlight steps, bracket-aware copy); shown once per child via localStorage
+    Tour.tsx            guided tour of the play page (8 spotlight steps on data-tour anchors, bracket-aware copy); shown on a
+                        child's first visit (localStorage flag per child, any game state) and from the 🧭 Tour button in the header
     Confetti.tsx        short deterministic confetti burst (badges, level-ups, goals, rewards)
     GrowthChart.tsx     value chart with ranges (1/3/5y/all), "only saved" and "savings account" lines net of purchases,
                         inflation toggle for bracket 3

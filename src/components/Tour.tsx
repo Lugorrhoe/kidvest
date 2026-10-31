@@ -11,23 +11,32 @@ export interface TourStep {
   text: string;
 }
 
-/** Bracket- and world-aware steps for a child's very first visit. */
+/** Bracket- and world-aware tour of the play page: shown on a child's first visit and from the 🧭 Tour button. */
 export function tourSteps(game: Game, ctx: Context): TourStep[] {
   const { world, bracket } = ctx;
   const cash = money(game.cash, world, bracket);
+  const fresh = game.season === 0;
   if (bracket === 1) {
     return [
-      { target: '.scene', emoji: '👋', title: `Welcome to ${world.name}!`, text: `You start with ${cash} in your ${world.baseName.toLowerCase()}. Tap any animal or tree to look closer and buy it with your coins.` },
-      { target: '[data-tour="next"]', emoji: '⏭️', title: 'Time moves when you say so', text: `Press this button to play the next ${world.seasonWord}. Your animals and trees grow, give you things, or sometimes shrink for a while.` },
-      { target: '[data-tour="chart"]', emoji: '📈', title: 'Watch your farm grow', text: 'This picture shows how much everything is worth over time. Lines go up and down, that is normal!' },
-      { target: '[data-tour="goal"]', emoji: '🎁', title: 'Save up for something nice', text: 'When you have saved enough, you can buy your next goal. It will appear in your world!' },
+      { target: '.scene', emoji: '👋', title: `Welcome to ${world.name}!`, text: `${fresh ? `You start with ${cash} in your ${world.baseName.toLowerCase()}.` : `This is your farm. Your ${world.baseName.toLowerCase()} holds ${cash}.`} Rest your mouse on an animal or tree to see how it is doing, and tap it to buy or sell.` },
+      { target: '[data-tour="next"]', emoji: '⏭️', title: 'Time moves when you say so', text: `Press this button to play the next ${world.seasonWord}. Your animals and trees grow, give you things, or sometimes shrink for a while. Four ${world.seasonWord}s make a year.` },
+      { target: '[data-tour="recap"]', emoji: '📰', title: 'What happened', text: `After every ${world.seasonWord}, this card tells you what changed: milk and eggs, storms, sunshine and pocket money.` },
+      { target: '[data-tour="holdings"]', emoji: '🧺', title: 'What you own', text: 'All your animals and trees in one list, with how many you have and what they are worth now.' },
+      { target: '[data-tour="market"]', emoji: '🛒', title: 'The farm market', text: 'Everything you can buy. Calm animals change little; wild ones can grow a lot or shrink a lot. Tap one to buy.' },
+      { target: '[data-tour="chart"]', emoji: '📈', title: 'Watch your farm grow', text: 'This picture shows how much everything is worth over time. The grey line shows what you would have if you had only saved. Lines go up and down, that is normal!' },
+      { target: '[data-tour="goal"]', emoji: '🎁', title: 'Save up for something nice', text: 'When you have saved enough, you can buy your next goal. It appears in your world! Badges and challenges live here too.' },
+      { target: '[data-tour="exit"]', emoji: '🔒', title: 'For your parents', text: 'Exit takes you back to the start page. There, your parents find their own area with reports and settings. You can replay this tour any time with the Tour button.' },
     ];
   }
   return [
-    { target: '.scene', emoji: '👋', title: `Welcome to ${world.name}!`, text: `You start with ${cash}. Everything you can invest in lives here. Click any plot to see details, risk and fees, and to buy or sell.` },
+    { target: '.scene', emoji: '👋', title: `Welcome to ${world.name}!`, text: `${fresh ? `You start with ${cash}.` : `Your ${world.baseName.toLowerCase()} holds ${cash}.`} Everything you can invest in lives here. Hover a plot for details, click it to buy or sell.` },
     { target: '[data-tour="next"]', emoji: '⏭️', title: 'You control time', text: `Nothing happens until you press this. Each ${world.seasonWord} brings price moves, payouts and pocket money. A year has four ${world.seasonWord}s.` },
-    { target: '[data-tour="chart"]', emoji: '📈', title: 'Your value over time', text: 'The chart compares your total with what you would have if you had only saved. Dips are part of the journey, patience usually wins.' },
-    { target: '[data-tour="goal"]', emoji: '🎯', title: 'Goals and challenges', text: 'Save towards real goals and complete challenges for XP. Spreading your money over different things earns badges too.' },
+    { target: '[data-tour="recap"]', emoji: '📰', title: 'What happened', text: `After every ${world.seasonWord}, this card sums up the moves, payouts, events and anything you unlocked.` },
+    { target: '[data-tour="holdings"]', emoji: '📋', title: 'Your holdings', text: 'What you own, how much it is worth now and how it has done since you bought it.' },
+    { target: '[data-tour="market"]', emoji: '🛒', title: world.marketName, text: `Everything you can invest in, with risk${bracket === 3 ? ', fees and payouts' : ' and payouts'}. Click one to see details and place an order.` },
+    { target: '[data-tour="chart"]', emoji: '📈', title: 'Your value over time', text: `The chart compares your total with what you would have if you had only saved${bracket === 3 ? ', and can show everything after inflation' : ''}. Dips are part of the journey, patience usually wins.` },
+    { target: '[data-tour="goal"]', emoji: '🎯', title: 'Goals, challenges and badges', text: 'Save towards real goals and complete challenges for XP. Spreading your money over different things earns badges too.' },
+    { target: '[data-tour="exit"]', emoji: '🔒', title: 'For your parents', text: 'Exit leads to the start page, where parents have their own area with reports, real-life rewards and settings. Replay this tour any time with the Tour button.' },
   ];
 }
 

@@ -106,7 +106,7 @@ export default function Play() {
       setGame(g);
       checkRewards(g);
       if (g.finished) setShowEnd(true);
-      if (g.season === 0 && (g.trades?.length ?? 0) === 0 && !localStorage.getItem(`kidvest-tour-${p.id}`)) setTour(true);
+      if (!localStorage.getItem(`kidvest-tour-${p.id}`)) setTour(true);
     })();
   }, [profileId, checkRewards]);
 
@@ -214,7 +214,8 @@ export default function Play() {
               <span className="text-sm font-bold">{profile.name}</span>
               <span className="text-xs text-ink-500">· {world.levelTitles[lv.level]}</span>
             </div>
-            <button className="btn btn-outline btn-md" onClick={() => nav('/')}>Exit</button>
+            <button className="btn btn-ghost btn-md" title="Show me around" onClick={() => { setSheet(null); setTour(true); }}>🧭 Tour</button>
+            <button data-tour="exit" className="btn btn-outline btn-md" onClick={() => nav('/')}>Exit</button>
           </div>
         </div>
       </header>
@@ -225,12 +226,12 @@ export default function Play() {
         <div className="grid grid-cols-[minmax(0,1fr)_380px] gap-6">
           <div className="min-w-0 space-y-6">
             <div data-tour="chart"><GrowthChart game={game} market={market} ctx={ctx} /></div>
-            <Holdings game={game} market={market} ctx={ctx} onOpen={setSheet} />
-            <MarketList game={game} market={market} ctx={ctx} onOpen={setSheet} />
+            <div data-tour="holdings"><Holdings game={game} market={market} ctx={ctx} onOpen={setSheet} /></div>
+            <div data-tour="market"><MarketList game={game} market={market} ctx={ctx} onOpen={setSheet} /></div>
           </div>
           <aside className="space-y-6">
             <RewardsCard rewards={rewards} game={game} market={market} ctx={ctx} />
-            <Recap game={game} ctx={ctx} report={report} />
+            <div data-tour="recap"><Recap game={game} ctx={ctx} report={report} /></div>
             <div data-tour="goal"><GoalCard game={game} market={market} ctx={ctx} onBuy={purchaseGoal} /></div>
             <AllocationCard game={game} market={market} ctx={ctx} />
             <ChallengesCard game={game} market={market} ctx={ctx} />
