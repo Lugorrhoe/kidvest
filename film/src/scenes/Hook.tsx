@@ -35,6 +35,10 @@ export function DataLine({ progress, opacity = 1, marker = true }: { progress: n
           <text x={xOfYear(y)} y={826} fill="#fff" fontSize="16" textAnchor="middle" fontFamily="Inter, 'Segoe UI', sans-serif">{y}</text>
         </g>
       ))}
+      <defs>
+        <linearGradient id="lineFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#fff" stopOpacity=".09" /><stop offset="1" stopColor="#fff" stopOpacity="0" /></linearGradient>
+      </defs>
+      {pts.length > 1 && <path d={`${toPath(pts)} L${pts[pts.length - 1].x.toFixed(1)} 800 L${pts[0].x.toFixed(1)} 800 Z`} fill="url(#lineFill)" />}
       <path d={toPath(pts)} fill="none" stroke="rgba(255,255,255,.92)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
       {showMarker && (
         <g opacity={markerO}>

@@ -2,7 +2,7 @@ import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import { Hero } from '../../../src/components/PlayParts';
 import { RewardCelebration, RewardsCard } from '../../../src/components/RewardsCard';
 import { Scene } from '../../../src/components/Scene';
-import { Camera, Caption, ConfettiBurst, Cursor, EASE, ModalCard, ParentTag, ProductFrame, Stage, fadeIn, rainVars, tw, type CamKey } from '../motion';
+import { Camera, Caption, ConfettiBurst, Cursor, EASE, ModalCard, ParentTag, ProductFrame, Stage, fadeIn, tw, type CamKey } from '../motion';
 import { REWARD_SEASON, rewardAt, thanja } from '../states';
 import { HEIGHT, SHOT, WIDTH } from '../timeline';
 
@@ -29,9 +29,8 @@ const CLICKS: { frame: number; season: number }[] = [
 const seasonAt = (frame: number) => CLICKS.reduce((s, c) => (frame >= c.frame + 2 ? c.season : s), 20);
 
 export function Play({ season, since, style }: { season: number; since: number; style?: React.CSSProperties }) {
-  const frame = useCurrentFrame();
   return (
-    <ProductFrame world="farm" y={PLAY_TOP} style={{ ...rainVars(frame), ...style }}>
+    <ProductFrame world="farm" y={PLAY_TOP} style={style}>
       <div className="space-y-6">
         <Hero game={thanja.at[season]} market={thanja.market} ctx={thanja.ctx} onNext={noop} onYear={noop} busy={false} pace={0} now={0} />
         <Scene game={thanja.at[season]} market={thanja.market} ctx={thanja.ctx} since={since} onOpen={noop} onBuyGoal={noop} />
@@ -44,9 +43,10 @@ export function LetDoChapter() {
   const frame = useCurrentFrame();
   const season = seasonAt(frame);
   const since = Math.max(20, season - 1);
-  // the sky clears: cross-dissolve from the last storm quarter into the sunny one
-  const clear = CLICKS[5].frame;
-  const dissolve = frame >= clear ? tw(frame, clear, clear + 12, 0, 1, EASE.inOut) : 0;
+  // every season change is a short cross-dissolve from the previous state, never a hard pop
+  const lastClick = CLICKS.reduce<number | null>((c, k) => (frame >= k.frame + 2 ? k.frame : c), null);
+  const dissolve = lastClick === null ? 1 : tw(frame, lastClick + 2, lastClick + 12, 0, 1, EASE.inOut);
+  const prevSeason = season - 1;
   // push in on the whole play area during the storm (nothing cropped), then make room for the rewards card
   const PLAY_CY = PLAY_TOP + 419;
   const push = (s: number) => ({ scale: s, x: 0, y: (HEIGHT / 2 - PLAY_CY) * s });
@@ -67,8 +67,8 @@ export function LetDoChapter() {
   return (
     <Stage accent="farm">
       <Camera keys={cam}>
-        {dissolve < 1 && <Play season={dissolve > 0 ? 25 : season} since={since} />}
-        {dissolve > 0 && <div style={{ position: 'absolute', inset: 0, opacity: dissolve }}><Play season={26} since={25} /></div>}
+        {dissolve < 1 && <Play season={prevSeason} since={Math.max(20, prevSeason - 1)} />}
+        <div style={{ position: 'absolute', inset: 0, opacity: dissolve }}><Play season={season} since={since} /></div>
       </Camera>
       <Cursor cam={cam} start={s7[0]} end={s9[1]} clicks={CLICKS.map((c) => c.frame)} path={[{ frame: s7[0], x: NEXT_BTN.x - 220, y: NEXT_BTN.y + 160 }, { frame: CLICKS[0].frame - 6, x: NEXT_BTN.x, y: NEXT_BTN.y }, { frame: s9[1], x: NEXT_BTN.x, y: NEXT_BTN.y }]} />
 

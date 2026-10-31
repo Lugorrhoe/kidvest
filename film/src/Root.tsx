@@ -16,7 +16,7 @@ loadFont('normal', { weights: ['400', '500', '600', '700', '800'], subsets: ['la
 export const Film: React.FC = () => {
   const frame = useCurrentFrame();
   return (
-    <AbsoluteFill style={{ background: '#14171d' }}>
+    <AbsoluteFill style={{ background: '#14171d', ['--t' as string]: frame / FPS }}>
       <Sequence from={CHAPTER.hook[0]} durationInFrames={dur(CHAPTER.hook)} name="HOOK"><HookChapter /></Sequence>
       <Sequence from={CHAPTER.show[0]} durationInFrames={dur(CHAPTER.show)} name="SHOW"><ShowChapter /></Sequence>
       <Sequence from={CHAPTER.letdo[0]} durationInFrames={dur(CHAPTER.letdo)} name="LET DO"><LetDoChapter /></Sequence>
@@ -27,7 +27,6 @@ export const Film: React.FC = () => {
       <ChapterLabel text="LET DO" start={CHAPTER.letdo[0]} end={CHAPTER.talk[0]} />
       <ChapterLabel text="TALK" start={CHAPTER.talk[0]} end={CHAPTER.payoff[0]} />
       <Wordmark start={SHOT.s3[0] + 30} end={SHOT.s15[0] + 20} />
-      {frame < 0 && null}
     </AbsoluteFill>
   );
 };

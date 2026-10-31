@@ -134,7 +134,8 @@ export function TalkChapter() {
   const cam: CamKey[] = [
     { frame: s12[0] + 30, scale: 1, x: 0, y: 0 },
     { frame: s12[0] + 90, scale: 1.45, x: (WIDTH / 2 - rowFocus.x) * 1.45, y: (HEIGHT / 2 - rowFocus.y) * 1.45 },
-    { frame: s12[1] - 30, scale: 1.45, x: (WIDTH / 2 - rowFocus.x) * 1.45, y: (HEIGHT / 2 - rowFocus.y) * 1.45 },
+    // a slow drift during the long read so the hold never feels frozen
+    { frame: s12[1] - 30, scale: 1.52, x: (WIDTH / 2 - rowFocus.x) * 1.52, y: (HEIGHT / 2 - rowFocus.y - 12) * 1.52 },
     { frame: s13[0], scale: 1, x: 0, y: 0 },
   ];
   const tlOut = fadeOut(frame, s13[0] + 10, 16);
@@ -146,7 +147,7 @@ export function TalkChapter() {
   return (
     <Stage accent="none">
       {farmVisible && (
-        <div style={{ position: 'absolute', inset: 0, transform: `translate(${farmX - recede * 420}px, ${farmY}px) scale(${farmScale})`, transformOrigin: '50% 50%', opacity: Math.min(fadeOut(frame, s13[0] + 10, 16), 1 - recede * 0.6) }}>
+        <div style={{ position: 'absolute', inset: 0, transform: `translate(${farmX - recede * 420}px, ${farmY}px) scale(${farmScale})`, transformOrigin: '50% 50%', opacity: Math.min(fadeIn(frame, s11[0], 22), fadeOut(frame, s13[0] + 10, 16), 1 - recede * 0.6) }}>
           <Play season={24} since={23} style={{ filter: 'drop-shadow(0 40px 80px rgba(0,0,0,.5))' }} />
         </div>
       )}

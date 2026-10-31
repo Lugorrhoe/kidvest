@@ -1,8 +1,11 @@
-/* Remotion renders one frame at a time: nothing may depend on the wall clock. */
-*, *::before, *::after { animation: none !important; transition: none !important; }
-
-/* Motion the film drives itself (see motion.tsx). */
-.rain { background-position: var(--rain-pos, 0 0) !important; }
+/* Remotion renders one frame at a time: nothing may depend on the wall clock.
+   The product's CSS animations (grazing cows, pecking hens, twinkling stars, rain) are kept but scrubbed:
+   paused, with a negative delay equal to the film time (--t, set on the film root in seconds). */
+*, *::before, *::after {
+  transition: none !important;
+  animation-play-state: paused !important;
+  animation-delay: calc(-1s * var(--t, 0)) !important;
+}
 
 /* Hover cards are opened by the film, not by a mouse. */
 .plot-tip { opacity: 0 !important; transform: none !important; }
