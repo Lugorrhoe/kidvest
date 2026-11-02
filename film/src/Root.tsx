@@ -10,7 +10,7 @@ import { LetDoChapter } from './scenes/LetDo';
 import { PayoffChapter } from './scenes/Payoff';
 import { ShowChapter } from './scenes/Show';
 import { TalkChapter } from './scenes/Talk';
-import { CHAPTER, FPS, HEIGHT, SHOT, SLICE, TOTAL, WIDTH, dur } from './timeline';
+import { CHAPTER, FPS, HEIGHT, SHOT, SLICE, TOTAL, V2_TOTAL, WIDTH, dur } from './timeline';
 
 loadFont('normal', { weights: ['400', '500', '600', '700', '800'], subsets: ['latin'] });
 
@@ -43,7 +43,7 @@ export const Root: React.FC = () => (
   <>
     <Composition id="KidvestFilm" component={Film} durationInFrames={TOTAL} fps={FPS} width={WIDTH} height={HEIGHT} />
     <Composition id="KidvestDemo" component={Demo} durationInFrames={TOTAL} fps={FPS} width={WIDTH} height={HEIGHT} />
-    <Composition id="KidvestDemoV2" component={DemoV2} durationInFrames={TOTAL} fps={FPS} width={WIDTH} height={HEIGHT} />
+    <Composition id="KidvestDemoV2" component={DemoV2} durationInFrames={V2_TOTAL} fps={FPS} width={WIDTH} height={HEIGHT} />
     <Composition id="Slice" component={Slice} durationInFrames={dur(SLICE)} fps={FPS} width={WIDTH} height={HEIGHT} />
   </>
 );

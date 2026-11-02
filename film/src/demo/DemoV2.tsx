@@ -9,7 +9,7 @@ import { money } from '../../../src/engine/format';
 import { yearReport, yearReview } from '../../../src/engine/forecast';
 import { Emoji, Logo } from '../../../src/lib/ui';
 import { ConfettiBurst, Cursor, EASE, ProductFrame, fadeIn, fadeOut, tw, type CursorKey } from '../motion';
-import { HEIGHT, TOTAL, WIDTH } from '../timeline';
+import { HEIGHT, V2_TOTAL, WIDTH } from '../timeline';
 import { LightStage, ProgressLine, SCREEN, Screen, ScreenModal, TUM, pageState, scrollAt, toStage } from './light';
 import { ChildrenTabLite, HomePage, ParentHeader, ParentPage, PinGatePage, PlayHeader, PlayPage, ReportsTabLite, RewardsTabLite } from './pages';
 import { KIDS, emilia, noah, rewardAt, thanja, type DemoKid } from './states';
@@ -17,26 +17,27 @@ import { KIDS, emilia, noah, rewardAt, thanja, type DemoKid } from './states';
 const noop = () => {};
 
 /* ------------------------------------------------------------------ timeline (absolute frames, 30 fps) */
+/* 105 s. The farm playthrough is paced for live narration; the world overview is one zoom-out. */
 const F = {
   homeIn: 50,
-  clickThanja: 180,
-  playIn: 195,
-  reportIn: 215, clickStart: 330,
-  tipHensOn: 385, clickHens: 436,
-  sheetIn: 440, clickBuy: 530,
-  seasons: [600, 660, 720, 780],
-  celebrateIn: 790, clickYay: 870,
-  reviewIn: 900, clickOk: 1000,
-  scroll: [{ f: 373, y: 0 }, { f: 393, y: 130 }, { f: 542, y: 130 }, { f: 570, y: 0 }, { f: 1020, y: 0 }, { f: 1080, y: 560 }, { f: 1135, y: 560 }, { f: 1185, y: 1080 }, { f: 1225, y: 1080 }, { f: 1262, y: 0 }],
-  clickExit1: 1272, home2In: 1285,
-  /* the zoomed-out world overview replaces the visits to Noah and Emilia */
-  railIn: 1370, railFarmHold: 1440, railToSpace: 1500, railSpaceHold: 1620, railToCity: 1680, railCityHold: 1790, railZoomOut: 1830, railOut: 1935,
-  home4In: 1945,
-  clickParents: 1982, pinIn: 1996, clickPinField: 2016, digits: [2032, 2044, 2056, 2068], clickUnlock: 2090, parentIn: 2104,
-  clickReports: 2222, reportsIn: 2236,
-  reportsScroll: [{ f: 2286, y: 0 }, { f: 2346, y: 560 }, { f: 2392, y: 560 }, { f: 2438, y: 820 }, { f: 2470, y: 820 }],
-  clickRewards: 2478, rewardsIn: 2492, clickDeliver: 2566,
-  endIn: 2604, fanIn: 2612, logoIn: 2662,
+  clickThanja: 200,
+  playIn: 215,
+  reportIn: 235, clickStart: 440,
+  tipHensOn: 560, clickHens: 660,
+  sheetIn: 664, clickBuy: 820,
+  seasons: [920, 1025, 1130, 1235],
+  celebrateIn: 1245, clickYay: 1370,
+  reviewIn: 1400, clickOk: 1560,
+  scroll: [{ f: 533, y: 0 }, { f: 553, y: 130 }, { f: 832, y: 130 }, { f: 862, y: 0 }, { f: 1580, y: 0 }, { f: 1650, y: 560 }, { f: 1760, y: 560 }, { f: 1820, y: 1080 }, { f: 1910, y: 1080 }, { f: 1960, y: 0 }],
+  clickExit1: 1972, home2In: 1985,
+  /* the three worlds: the farm at scene scale, then one zoom-out to all three side by side */
+  railIn: 2050, railZoomOut: 2080, railOut: 2230,
+  home4In: 2240,
+  clickParents: 2300, pinIn: 2314, clickPinField: 2334, digits: [2350, 2362, 2374, 2386], clickUnlock: 2408, parentIn: 2422,
+  clickReports: 2540, reportsIn: 2554,
+  reportsScroll: [{ f: 2604, y: 0 }, { f: 2664, y: 560 }, { f: 2714, y: 560 }, { f: 2764, y: 820 }, { f: 2800, y: 820 }],
+  clickRewards: 2808, rewardsIn: 2822, clickDeliver: 2896,
+  endIn: 2936, fanIn: 2944, logoIn: 3000,
 };
 
 /* Page coordinates (1440 px wide) of the things the cursor visits; tuned against stills. */
@@ -74,8 +75,9 @@ function WorldRail() {
   const frame = useCurrentFrame();
   const o = Math.min(fadeIn(frame, F.railIn, 24), fadeOut(frame, F.railOut, 16));
   // camera x (rail offset) and scale
-  const ZOOM = 45;
-  const x = frame < F.railToSpace ? 0 : frame < F.railSpaceHold ? tw(frame, F.railToSpace, F.railSpaceHold, 0, -GAP) : frame < F.railToCity ? -GAP : frame < F.railCityHold ? tw(frame, F.railToCity, F.railCityHold, -GAP, -2 * GAP) : frame < F.railZoomOut ? -2 * GAP : tw(frame, F.railZoomOut, F.railZoomOut + ZOOM, -2 * GAP, -GAP);
+  const ZOOM = 50;
+  // start on the farm at scene scale, then one continuous zoom-out that centres the three worlds
+  const x = tw(frame, F.railZoomOut, F.railZoomOut + ZOOM, 0, -GAP);
   const scale = frame < F.railZoomOut ? tw(frame, F.railIn, F.railIn + 30, 0.78, 0.72) : tw(frame, F.railZoomOut, F.railZoomOut + ZOOM, 0.72, 0.4);
   const labelO = frame < F.railZoomOut ? 1 : tw(frame, F.railZoomOut, F.railZoomOut + 20, 1, 0);
   const allO = tw(frame, F.railZoomOut + ZOOM - 10, F.railZoomOut + ZOOM + 20, 0, 1);
@@ -188,7 +190,7 @@ export function DemoV2() {
   const s = (p: { x: number; y: number }, scrollY = 0) => toStage(p.x, p.y, scrollY);
   const path1: CursorKey[] = [
     { frame: 100, ...s({ x: 980, y: 620 }) },
-    { frame: 170, ...s(P.cardThanja) },
+    { frame: F.clickThanja - 10, ...s(P.cardThanja) },
     { frame: F.playIn + 10, ...s(P.cardThanja) },
     { frame: F.clickStart - 8, ...M.startYear },
     { frame: F.clickStart + 20, ...M.startYear },
@@ -202,8 +204,8 @@ export function DemoV2() {
     { frame: F.clickYay + 20, ...M.yay },
     { frame: F.clickOk - 10, ...M.ok },
     { frame: F.clickOk + 15, ...M.ok },
-    { frame: 1040, ...s({ x: 1380, y: 500 }) },
-    { frame: 1250, ...s({ x: 1380, y: 500 }) },
+    { frame: F.scroll[4].f + 20, ...s({ x: 1380, y: 500 }) },
+    { frame: F.scroll[8].f + 20, ...s({ x: 1380, y: 500 }) },
     { frame: F.clickExit1 - 6, ...s(P.exit) },
     { frame: F.home2In + 10, ...s(P.exit) },
     { frame: F.railIn - 20, ...s({ x: 980, y: 620 }) },
@@ -287,7 +289,7 @@ export function DemoV2() {
 
       <Cursor tone="light" start={100} end={F.railIn} clicks={clicks1} path={path1} />
       <Cursor tone="light" start={F.home4In + 10} end={F.endIn} clicks={clicks2} path={path2} />
-      <ProgressLine total={TOTAL} />
+      <ProgressLine total={V2_TOTAL} />
 
       {/* closing: white, the three worlds fan out, then the logo */}
       <AbsoluteFill style={{ background: '#fff', opacity: white, pointerEvents: 'none' }} />

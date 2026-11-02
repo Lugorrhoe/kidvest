@@ -33,6 +33,8 @@ export const CHAPTER = {
 };
 
 export const TOTAL = sec(90);
+/** The pitch demo (KidvestDemoV2) runs longer so the presenter has time on the farm. */
+export const V2_TOTAL = sec(105);
 
 /** Milestone 1 vertical slice: SHOW plus the first LET DO shot. */
 export const SLICE = [SHOT.s3[0], SHOT.s7[1]] as Span;
